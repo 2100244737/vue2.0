@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <title>Document</title>
+    <style>
+
+        .input {
+            width: 230px;
+        }
+
+        .form {
+            display: flex;
+        }
+
+        .el-dialog {
+            width: 90vw;
+        }
+
+        .button {
+            height: 40px;
+            margin-left: 20px;
+            margin-bottom: 20px;
+        }
+
+    </style>
+</head>
+
+<body>
+<div id="app" v-if="show">
+    <el-form :model="dataList" class="form" label-width="80px">
+        <el-form-item label="车牌号">
+            <el-input class="input" v-model="dataList.carNumber" placeholder="请输入车牌号"></el-input>
+        </el-form-item>
+        <el-form-item label="上传时间">
+            <el-date-picker v-model="dataList.time" type="date" value-format="yyyy-MM-dd" format="yyyy-MM-dd"
+                            placeholder="选择日期">
+            </el-date-picker>
+        </el-form-item>
+
+        <el-form-item label="入口时间">
+            <el-input class="input" v-model="dataList.entrance" placeholder="请输入口时间"></el-input>
+        </el-form-item>
+
+
+        <el-form-item label="车牌颜色">
+            <el-select v-model="dataList.color" placeholder="请选择活动区域">
+                <el-option label="蓝色" value="0"></el-option>
+                <el-option label="黄色" value="1"></el-option>
+                <el-option label="黑色" value="2"></el-option>
+                <el-option label="白色" value="3"></el-option>
+                <el-option label="渐变绿色" value="4"></el-option>
+                <el-option label="黄绿双拼色" value="5"></el-option>
+                <el-option label="蓝白渐变色" value="6"></el-option>
+                <el-option label="临时牌照" value="7"></el-option>
+            </el-select>
+        </el-form-item>
+    </el-form>
+    <el-button class="button" type="primary" @click="lookClick">查询</el-button>
+    <el-button class="button" type="primary" @click="lookMap">查看地图</el-button>
+    <el-table :data="tableData" border>
+        <el-table-column type="index" width="50">
+        </el-table-column>
+        <el-table-column label="数据名称" prop="fileName">
+        </el-table-column>
+        <el-table-column label="操作">
+            <template slot-scope="scope">
+                <el-button type="primary" @click="handleClick(scope.row)">详情</el-button>
+
+            </template>
+        </el-table-column>
+    </el-table>
+
+    <el-dialog :visible.sync="dialogTableVisible">
+        <div class="json">
+            {{json}}
+        </div>
+        <span slot="footer" class="dialog-footer">
+        <el-button size="mini" type="primary" @click="clear">关 闭</el-button>
+      </span>
+    </el-dialog>
+
+
+</div>
+</body>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+
+</script>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: function () {
+            return {
+                dataList: {
+                    color: '0',
+                    time: '2020-05-08', // 上传时间
+                    entrance: '2020-05-06T00-00-00', // 入口时间
+                    carNumber: '晋EK0569',
+                },
+                show: true,
+                tableData: [], // 表格数据
+                dialogTableVisible: false,
+                json: ''
+            }
+        },
+
+        methods: {
+            lookMap() {
+                window.location.href = "view.html";
+
+            },
+            lookClick() {
+                var _t = this
+                sessionStorage.setItem("JSON", )
+                // 查询 数据
+                // const selectedData = {
+                //     enTime: this.dataList.entrance,
+                //     plateNum: this.dataList.carNumber,
+                //     plateColor: this.dataList.color, // 转Number
+                //     insertDate: this.dataList.time
+                // }
+                //
+                // // 数据处理
+                // //  JSON.stringify(jsonData).toString().replace(new RegExp("\\\\\"","gm"),"\"")
+                // const params = {
+                //     "bizContent": JSON.stringify(selectedData),
+                //     "encryptType": "NONE",
+                //     "filename": "FCS_LOG_LIST_REQ_99999917_20200306170243825.json",
+                //     "sign": "NONE",
+                //     "signType": "NONE",
+                //     "timestamp": "2020-03-06T17:02:44",
+                //     "tokenType": "USER_AUTH",
+                //     "accessToken": "chinaetcorg"
+                // }
+                // axios.post('/b/api/json', params).then(function (response) {
+                //     if (response.data.statusCode != 0) {
+                //         _t.$confirm(response.data.errorMsg, '查询日志失败', {
+                //             confirmButtonText: '确定',
+                //             cancelButtonText: '取消',
+                //             type: 'warning'
+                //         })
+                //     }
+                //     console.log(response);
+                //     const data = JSON.parse(response.data.bizContent)
+                //     _t.tableData = data.uploadModels
+                //
+                // }).catch(function (error) {
+                //     console.log(error);
+                // });
+            },
+            clear() {
+                this.dialogTableVisible = false;
+                this.json = ''
+
+                this.json = ''
+            },
+            handleClick(row) {
+                // 详情
+                var _t = this
+                const selectedData = {
+                    fileId: row.fileId
+                }
+
+                const params = {
+                    "bizContent": JSON.stringify(selectedData),
+                    "encryptType": "NONE",
+                    "filename": "FCS_LOG_FIND_REQ_99999917_20200306170243825.json",
+                    "sign": "NONE",
+                    "signType": "NONE",
+                    "timestamp": "2020-04-06T17:02:44",
+                    "tokenType": "USER_AUTH",
+                    "accessToken": "chinaetcorg"
+                }
+                axios.post('https://feelog.txffp.com/fcs/api/json', params).then(function (response) {
+                    console.log(response);
+                    if (response.data.statusCode != 0) {
+                        _t.$confirm(response.data.errorMsg, '查询日志失败', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        })
+                    }
+
+                    const data = JSON.parse(response.data.bizContent)
+                    _t.json = data.jsonStr
+
+                }).catch(function (error) {
+                    console.log(error);
+                });
+                this.dialogTableVisible = true
+            }
+
+        },
+        created() {
+            //this.lookClick()
+        },
+    })
+
+</script>
+
+</html>

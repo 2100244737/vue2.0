@@ -1,0 +1,20 @@
+/*// 表单*/
+.formBox-top {
+  border-bottom: 1px solid #cccccc;
+}
+.dialogTitle {
+  font-size: 20px;
+  font-weight: 700;
+}
+.el-dialog__header {
+  border-bottom: 1px solid #ccc;
+}
+.el-dialog__footer {
+  border-top: 1px solid #ccc;
+}
+/*表格数据背景色*/
+.el-table th {
+  background-color: #ddd;
+}
+
+

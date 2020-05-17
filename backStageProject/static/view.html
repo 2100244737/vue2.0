@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<!--<%@ page contentType="text/html;charset=utf-8"%>-->
+<html lang="en">
+<head>
+    <meta http-equiv="expires" content="0"/>
+    <!-- <%@ include file="/WEB-INF/jsp/assets.jsp" %>-->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <style>
+        html,
+        body,
+        #container {
+            width: 100%;
+            height: 100%;
+            font-size: 14px;
+        }
+
+        a {
+            text-decoration: none;
+            color: #409EFF;
+            font-weight: 700;
+            margin-left: 0;
+        }
+
+        ul li {
+            list-style: none;
+            padding-left: 0px;
+        }
+
+        ul {
+            padding-left: 0px;
+        }
+
+        #intervals {
+            padding-left: 0px;
+
+            background: #fff;
+        }
+
+        .left_menu_bg {
+            text-align: center;
+        }
+
+        .btn {
+            position: fixed;
+            left: 50px;
+            top: 50px;
+            width: 100px;
+            height: 50px;
+            font-size: 20px;
+            background: #25A5F7;
+            color: #fff;
+            z-index: 9999;
+        }
+        .btnShow {
+            background: #25A5F7;
+            color: #fff;
+            padding: 15px;
+            border-radius: 15px;
+            position: fixed;
+            top :5%;
+            right: 5%;
+            border: none;
+        }
+    </style>
+    <title>路径还原</title>
+
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
+    <script
+        src="https://webapi.amap.com/maps?v=1.4.15&key=key=142567df3f87fb5698fcd0056ee0b842&plugin=AMap.PolyEditor"></script>
+    <script src="https://a.amap.com/jsapi_demos/static/demo-center/js/demoutils.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.bootcss.com/jquery/3.4.1/jquery.js"></script>
+
+</head>
+<body>
+
+
+<div id="container"></div>
+<button  class="btnShow" id="btnShow">展开</button>
+<!-- 路径还原选择 -->
+<div class="left_menu hidden-xs"
+     style="padding:0px 0px 0px 0px;height:6%;width:10%;position:fixed; top:10%; left:10% ;">
+    <div class="left_menu_bg">
+        <ul>
+            <li class="has-sub " id="mySelection">
+                <a href="#none">
+                    <div class="menu_wz" style="text-align:center"> 选择路径</div>
+                    <div class="menu_jt">
+                        <i class="fa fa-caret-down fa-lg"></i></div>
+                </a>
+
+            </li>
+        </ul>
+    </div>
+</div>
+
+<!-- 收费单元 -->
+<div class="left_menu hidden-xs"
+     style="padding:0px 0px 0px 0px;height:6%;width:15%;position:fixed; top:10%; left:80% ; min-height: calc(100% - 160px); height: calc(100% - 120px); overflow-y: hidden;">
+    <div class="left_menu_bg">
+        <ul id="intervals">
+        </ul>
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {
+        $.ajaxSetup({cache: false});
+        $("#myManage").taiji({
+            enableAclCheck: true,
+            search: {
+                seachResultType: 'table',
+                autoSearch: false
+            }
+        })
+    });
+</script>
+<!--引入数据-->
+<script type="text/javascript" src="amp.js"></script>
+<script>
+
+</script>
+<script>
+    var btnShow= document.getElementById("btnShow");
+    var intervals= document.getElementById("intervals");
+    intervals.style.display = 'none'
+    btnShow.onclick=function(){
+        if(btnShow.innerHTML==="收起"){
+            this.innerHTML="展开";
+            intervals.style.display="none";
+        }else{
+            this.innerHTML="收起";
+            intervals.style.display="block";
+        }
+    }
+
+</script>
+<!--引入数据-->
+<script>
+
+</script>
+<!--  初始化地图和路径 -->
+<script type="text/javascript">
+     var strData = JSON.parse(sessionStorage.getItem("JSON")).data
+     var jsonData = JSON.parse(strData);
+    var map2 = jsonData;
+
+    $(function () {
+
+        // jsonData = ${jsonData }
+        // console.info("jsonData ----------")
+        // console.info(jsonData)
+        // console.info("jsonData ----------")
+
+        if (jsonData == null) {
+            alert("未找到路径还原")
+            drawLine4Empty();
+        } else {
+            showSelection(jsonData);
+            showIntervals(jsonData, 0);
+            map2 = drawLine(jsonData, 0);
+        }
+
+    })
+
+    function showSelection(jsonData) {
+        var route = jsonData.route;
+        var a = "<ul class='sub'>"
+        for (var i = 0; i < route.length; i++) {
+            a += ("<li><a href='#' onclick='selectionOnclick(" + i + ")'>路径" + (i + 1) + "<div class='menu_jt'></div></a></li>");
+        }
+        a += "</ul>";
+        $("#mySelection").append(a);
+
+    }
+
+
+    function showIntervals(jsonData, index) {
+        // 清除
+        $("#intervals").empty();
+
+        var dataMap = new Map();
+        // 获取收费公路下的收费单元
+        var unit = jsonData.route[index].unit;
+        for (var k = 0; k < unit.length; k++) {
+            var roadName = unit[k].roadName;
+
+            var entry = dataMap.get(roadName);
+            if (entry == null) {
+                entry = new Array();
+                entry[0] = unit[k].id;
+                dataMap.set(roadName, entry);
+            } else {
+                entry[entry.length] = unit[k].id;
+                dataMap.set(roadName, entry);
+            }
+        }
+
+        // 生成收费单元列表
+        dataMap.forEach(function (values, key) {
+            var a = "<li class='has-sub' ><a href='#' onClick='hasSubOnClick(this)'><div class='menu_wz' style ='text-align:center;padding-left:20px'>"
+                + key + "</div><div class='menu_jt'><i class='fa fa-caret-down fa-lg'></i></div></a>";
+
+            var ul = "<ul class='sub'>";
+
+            for (var i = 0; i < values.length; i++) {
+                ul += "<li><a href='#'>" + values[i] + "<div class='menu_jt'></div></a></li>"
+            }
+
+            ul += "</ul>";
+
+            a += ul;
+            a += "</li>"
+            $("#intervals").append(a);
+        });
+    }
+
+    function selectionOnclick(index) {
+        console.info("显示路径还原： " + index);
+
+        // 显示路径的收费单元
+        showIntervals(jsonData, index);
+        // 画路径还原点
+        map = drawLine(jsonData, index);
+    }
+
+    function drawLine(jsonData, index) {
+        // 初始化地图
+        var map = new AMap.Map("container", {
+            center: [116.395577, 39.892257],
+            zoom: 14
+        });
+
+        var link = jsonData.route[index].link;
+
+        // 获取不同类型的路径还原点
+        // 全量
+        var path = new Array();
+        var k = 0;
+
+        var pathNull = new Array();
+        var k1 = 0;
+        var pathNONE = new Array();
+        var k2 = 0;
+        var pathADD = new Array();
+        var k3 = 0;
+        for (var i = 0; i < link.length; i++) {
+            var amendStatus = link[i].amendStatus;
+            var geometry = link[i].geometry;
+            if (amendStatus == null) {
+                var latLng = new Array();
+                for (var j = 0; j < geometry.length; j++) {
+                    latLng[j] = new Array(geometry[j].lng, geometry[j].lat);
+
+                    path[k] = new Array(geometry[j].lng, geometry[j].lat);
+                    k++;
+                }
+                if (latLng.length != 0) {
+                    pathNull[k1] = latLng;
+                    k1++;
+                }
+            } else {
+                switch (amendStatus) {
+                    case 'NONE':
+                        var latLng = new Array();
+                        for (var j = 0; j < geometry.length; j++) {
+                            latLng[j] = new Array(geometry[j].lng, geometry[j].lat);
+
+                            path[k] = new Array(geometry[j].lng, geometry[j].lat);
+                            k++;
+                        }
+                        if (latLng.length != 0) {
+                            pathNONE[k2] = latLng;
+                            k2++;
+                        }
+                        break;
+                    case 'ADD':
+                        var latLng = new Array();
+                        for (var j = 0; j < geometry.length; j++) {
+                            latLng[j] = new Array(geometry[j].lng, geometry[j].lat);
+
+                            path[k] = new Array(geometry[j].lng, geometry[j].lat);
+                            k++;
+                        }
+                        if (latLng.length != 0) {
+                            pathADD[k3] = latLng;
+                            k3++;
+                        }
+                        break;
+                }
+            }
+
+        }
+
+
+        // console.info(JSON.stringify(pathNONE));
+        // console.info(JSON.stringify(pathADD));
+        // console.info(JSON.stringify(pathNull));
+        // console.info("-----------获取还原点类型-----------")
+        // console.info("无变化点数（null）：" + pathNull.length + ", k= " + k1);
+        // console.info("无变化点数：" + pathNONE.length + ", k= " + k2);
+        // console.info("新增点数：" + pathADD.length + ", k= " + k3);
+        // console.info("-----------获取还原点类型-----------")
+
+        // 1、为空路径
+        if (pathNull.length != 0) {
+            pathNull.forEach(function (value) {
+                setPolyline(map, value, "#238E68");
+            });
+        }
+
+        // 2、NONE类型路径
+        if (pathNONE.length != 0) {
+            pathNONE.forEach(function (value) {
+                setPolyline(map, value, "#238E68");
+            });
+        }
+
+        // 3、ADD类型路径
+        if (pathADD.length != 0) {
+            pathADD.forEach(function (value) {
+                setPolyline(map, value, "#2894FF");
+            });
+        }
+
+        // 入出口位置标示
+        var enNode = jsonData.route[index].enNode.roadName;
+        var exNode = jsonData.route[index].exNode.roadName;
+        // var enNode = "${enTollStationName}"
+        // var exNode = "${exTollStationName}"
+        if (enNode == null) {
+            enNode = "出口位置";
+        }
+        if (exNode == null) {
+            exNode = "入口位置";
+        }
+
+        var endIcon = new AMap.Icon({
+            size: new AMap.Size(25, 34),
+            image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/dir-marker.png',
+            imageSize: new AMap.Size(135, 40),
+            imageOffset: new AMap.Pixel(-95, -3)
+        });
+        var marker = new AMap.Marker({
+            icon: endIcon,
+            position: path[path.length - 1],
+            zIndex: 100
+        });
+        marker.setLabel({
+            offset: new AMap.Pixel(0, -30),  //设置文本标注偏移量
+            content: "<div style='top:-2rem;padding: .75rem 1.25rem;margin-bottom: 1rem;border-radius: .25rem;position: fixed;background-color: white;width: auto;border-width: 0;right: 1rem;box-shadow: 0 2px 6px 0 rgba(114, 124, 245, .5);'>" + enNode + "</div>", //设置文本标注内容
+            direction: 'top' //设置文本标注方位
+        });
+        marker.setMap(map);
+
+        var startIcon = new AMap.Icon({
+            size: new AMap.Size(25, 34),
+            image: 'https://a.amap.com/jsapi_demos/static/demo-center/icons/dir-marker.png',
+            imageSize: new AMap.Size(135, 40),
+            imageOffset: new AMap.Pixel(-9, -3)
+        });
+        var marker2 = new AMap.Marker({
+            icon: startIcon,
+            position: path[0],
+            zIndex: 100
+        });
+        marker2.setLabel({
+            offset: new AMap.Pixel(0, -30),  //设置文本标注偏移量
+            content: "<div style='top:-2rem;padding: .75rem 1.25rem;margin-bottom: 1rem;border-radius: .25rem;position: fixed;background-color: white;width: auto;border-width: 0;right: 1rem;box-shadow: 0 2px 6px 0 rgba(114, 124, 245, .5);'>" + exNode + "</div>", //设置文本标注内容
+            direction: 'top' //设置文本标注方位
+        });
+        marker2.setMap(map);
+
+        // 缩放地图到合适的视野级别
+        map.setFitView([marker, marker2])
+        return map;
+    }
+
+    function setPolyline(map, myPath, color) {
+        var polyline = new AMap.Polyline({
+            path: myPath,
+            isOutline: true,
+            outlineColor: color,
+            strokeColor: color,
+            strokeOpacity: 1,
+            // 折线样式还支持 'dashed'
+            strokeStyle: "solid",
+            // strokeStyle是dashed时有效
+            strokeDasharray: [10, 5],
+            lineJoin: 'round',
+            lineCap: 'round',
+            zIndex: 50,
+        })
+        polyline.setMap(map);
+    }
+
+    function drawLine4Empty() {
+        // 初始化地图
+        var map = new AMap.Map("container", {
+            center: [116.395577, 39.892257],
+            zoom: 14
+        });
+    }
+
+    function hasSubOnClick(self) {
+        var e = $(self).next(".sub");
+        var t = ".left_menu > ul > li.has-sub > .sub";
+        $(t).not(e).slideUp(250);
+        $(e).slideToggle(250)
+    }
+
+</script>
+</body>
+</html>
