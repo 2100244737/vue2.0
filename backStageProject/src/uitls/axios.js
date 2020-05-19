@@ -57,6 +57,7 @@ function apiAxios(method, url, params, success) {
                 }).then(() => {
                     _this.$router.push('/login')
                 }).catch(() => {
+                    _this.$router.push('/login')
                   return false
                 });
             } else {

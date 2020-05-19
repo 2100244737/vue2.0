@@ -14,7 +14,7 @@ class DoneMessage {
           message: options,
           type: type,
           offset: 150,
-          duration: 3000
+          duration: 4000
         })
       }
     } else {
@@ -23,7 +23,7 @@ class DoneMessage {
         message: options,
         type: type,
         offset: 150,
-        duration: 3000
+        duration: 4000
       })
       // Message[type](options)
     }

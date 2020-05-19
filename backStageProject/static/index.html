@@ -185,13 +185,8 @@
                 axios.post('https://feelog.txffp.com/fcs/api/json', params).then(function (response) {
                     console.log(response);
                     if (response.data.statusCode != 0) {
-                        _t.$confirm(response.data.errorMsg, '查询日志失败', {
-                            confirmButtonText: '确定',
-                            cancelButtonText: '取消',
-                            type: 'warning'
-                        })
-                    }
 
+                    }
                     const data = JSON.parse(response.data.bizContent)
                     _t.json = data.jsonStr
 

@@ -21,7 +21,11 @@ const BIND_ADD ='FCS_BIND_ADD_REQ_99999925_';    // 部署功能保存
 const BIND_DELETE ='FCS_BIND_DELETE_REQ_99999925_';    // 停用
 const BIND_CONFIRM ='FCS_BIND_CONFIRM_REQ_99999925_';      // 添加保存
 const BIND_PAGE ='FCS_BIND_PAGE_REQ_99999925_';      // 查询
+const BIND_RELEASE ='FCS_BIND_RELEASE_REQ_99999925_n';      // 查询
+
+
  export {
+     BIND_RELEASE,
      USER_LOGOUT,
      SSO_FIND,
      SSO_ADD,

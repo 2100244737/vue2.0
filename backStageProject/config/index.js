@@ -13,8 +13,8 @@ module.exports = {
     proxyTable: {
         // https//device.cywetc.com/fcs/api/json
       '/api': {
-        // target: 'http://10.1.0.223',
-          target: 'https://testgw.cywetc.com',
+        target: 'http://10.1.0.223',
+        //   target: 'https://testgw.cywetc.com',
         //   target: 'https//device.cywetc.com/fcs',
         changeOrigin: true,
         pathRewrite: {

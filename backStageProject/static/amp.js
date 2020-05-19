@@ -19,22 +19,14 @@ function getData(row) {
     }
     axios.post('/b/api/json', params).then(function (response) {
         if (response.data.statusCode != 0) {
-            _t.$confirm(response.data.errorMsg, '查询日志失败', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-            })
+
         } else {
             if (response.data.bizContent) {
                 str = JSON.parse(response.data.bizContent).data
                 // _t.setData(JSON.stringify(JSON.parse(response.data.bizContent).data))
                 // JSON.stringify(JSON.parse(response.data.bizContent).data)
             } else {
-                _t.$confirm(response.data.errorMsg, '此文件无法查看地图', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    type: 'warning'
-                })
+
             }
 
         }

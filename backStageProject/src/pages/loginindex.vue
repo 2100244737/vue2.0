@@ -137,11 +137,14 @@
                         _t.loginForm.accessToken = JSON.parse(res.bizContent).accessToken;
                        const mobile = JSON.parse(res.bizContent).mobile;
                        const name = JSON.parse(res.bizContent).name;
-                        _t.$router.push("/index");
+                       const roleName = JSON.parse(res.bizContent).roleName?JSON.parse(res.bizContent).roleName: '';
+
+                         _t.$router.push("/index");
                         _t.$cookie.set('openId', _t.loginForm.openId);
                         _t.$cookie.set('accessToken', _t.loginForm.accessToken);
-                        _t.$cookie.set('username', name);
-                        _t.$cookie.set('phone', mobile);
+                        _t.$cookie.set('username', name); // 用户名
+                        _t.$cookie.set('phone', mobile); // 手机号
+                        _t.$cookie.set('roleName', roleName); // 角色
                     } else {
                         _t.alertDialogTip(_t, res.errorMsg)
                     }
@@ -198,7 +201,6 @@
                         // 提交
                         _t.toHome();
                     } else {
-                        console.log('error submit!!');
                         return false;
                     }
                 });
@@ -226,6 +228,7 @@
             this.$cookie.delete('accessToken');
             this.$cookie.delete('phone');
             this.$cookie.delete('username');
+           this.$cookie.delete('roleName');
             sessionStorage.removeItem("MENU_LIST");
         }
     }

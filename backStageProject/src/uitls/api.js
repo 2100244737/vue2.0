@@ -1,1 +1,1 @@
-
+bizContent: "{"currentPage":1,"data":[{"accessToken":"accesstoken","mapAppType":"阿里APP","mobile":"18310370054","nickName":"**琴","openId":"4d9f95b4f7ba4a8cb98ee13581caef26","roleId":"系统管理员","stationId":"G0001110010010","stationName":"北京白鹿主站"},{"accessToken":"accesstoken","mapAppType":"特情终端管理后台","mobile":"18310370054","nickName":"**琴","openId":"266b5c9e6c244ff891db9cc70685ab02","roleId":"系统管理员","stationId":"G0001110010010","stationName":"北京白鹿主站"}],"pageCount":1,"pageSize":10,"totalCount":2}"

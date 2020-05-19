@@ -44,7 +44,9 @@
         .left_menu_bg {
             text-align: center;
         }
-
+         .left_menu {
+             z-index: 9999999;
+         }
         .btn {
             position: fixed;
             left: 50px;
@@ -59,12 +61,15 @@
         .btnShow {
             background: #25A5F7;
             color: #fff;
-            padding: 15px;
+            width: 60px;
+            height: 50px;
             border-radius: 15px;
             position: fixed;
             top :5%;
             right: 5%;
             border: none;
+            z-index: 999999999;
+            cursor:pointer;
         }
     </style>
     <title>路径还原</title>
@@ -136,6 +141,7 @@
             this.innerHTML="收起";
             intervals.style.display="block";
         }
+        return false;
     }
 
 </script>
@@ -204,11 +210,10 @@
         dataMap.forEach(function (values, key) {
             var a = "<li class='has-sub' ><a href='#' onClick='hasSubOnClick(this)'><div class='menu_wz' style ='text-align:center;padding-left:20px'>"
                 + key + "</div><div class='menu_jt'><i class='fa fa-caret-down fa-lg'></i></div></a>";
-
             var ul = "<ul class='sub'>";
 
             for (var i = 0; i < values.length; i++) {
-                ul += "<li><a href='#'>" + values[i] + "<div class='menu_jt'></div></a></li>"
+                ul += "<li ><a href='#' style='color: #E6A23C'>" + values[i] + "<div class='menu_jt'></div></a></li>"
             }
 
             ul += "</ul>";

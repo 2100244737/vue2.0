@@ -3,10 +3,11 @@
         <div class="formBox-top">
             <el-form :model="formItem" label-width="90px" inline>
                 <el-form-item>
-                    <el-input  clearable maxlength="150" v-model="formItem.equipmentNumber" placeholder="设备编号"></el-input>
+                    <el-input clearable maxlength="150" v-model="formItem.equipmentNumber"
+                              placeholder="设备编号"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-input  clearable maxlength="150" v-model="formItem.state" placeholder="芯片编号"></el-input>
+                    <el-input clearable maxlength="150" v-model="formItem.state" placeholder="芯片编号"></el-input>
                 </el-form-item>
                 <el-form-item label="设备厂商：">
                     <el-select
@@ -83,11 +84,11 @@
             </div>
             <el-form :model="addEdit" :rules="rules" ref="addList" label-width="150px">
                 <el-form-item label="设备编号：" prop="deviceId">
-                    <el-input  clearable v-model="addEdit.deviceId" placeholder="设备编号"></el-input>
+                    <el-input clearable maxlength="50" v-model="addEdit.deviceId" placeholder="设备编号"></el-input>
                 </el-form-item>
-<!--                <el-form-item label="设备SE芯片编号：" prop="seNo">-->
-<!--                    <el-input  clearable  v-model="addEdit.seNo" placeholder="芯片编号"></el-input>-->
-<!--                </el-form-item>-->
+                <!--                <el-form-item label="设备SE芯片编号：" prop="seNo">-->
+                <!--                    <el-input  clearable  v-model="addEdit.seNo" placeholder="芯片编号"></el-input>-->
+                <!--                </el-form-item>-->
             </el-form>
             <div slot="footer">
                 <el-button @click="resetCode">取消</el-button>
@@ -229,7 +230,8 @@
                             </el-tooltip>
                         </el-form-item>
                         <el-form-item label="设备型号：">
-                            <el-tooltip :content="detailsData.model?detailsData.model:'设备型号'" placement="top-start" effect="light">
+                            <el-tooltip :content="detailsData.model?detailsData.model:'设备型号'" placement="top-start"
+                                        effect="light">
                                 <el-input :disabled="true" v-model="detailsData.model" placeholder="设备型号"></el-input>
                             </el-tooltip>
                         </el-form-item>
@@ -245,25 +247,34 @@
                         <!--                            <el-input :disabled="true" v-model="detailsData.openId" placeholder="操作员id"></el-input>-->
                         <!--                        </el-form-item>-->
                         <el-form-item label="收费站名称：">
-                            <el-tooltip :content="detailsData.stationId?detailsData.stationId: '收费站名称'" placement="top-start" effect="light">
-                                <el-input :disabled="true" v-model="detailsData.stationId" placeholder="收费站名称"></el-input>
+                            <el-tooltip :content="detailsData.stationId?detailsData.stationId: '收费站名称'"
+                                        placement="top-start" effect="light">
+                                <el-input :disabled="true" v-model="detailsData.stationId"
+                                          placeholder="收费站名称"></el-input>
                             </el-tooltip>
                         </el-form-item>
                         <el-form-item label="收费广场名称：">
-                            <el-tooltip :content="detailsData.tollPlazaId?detailsData.tollPlazaId: '收费广场名称'" placement="top-start" effect="light">
+                            <el-tooltip :content="detailsData.tollPlazaId?detailsData.tollPlazaId: '收费广场名称'"
+                                        placement="top-start" effect="light">
                                 <el-input :disabled="true" v-model="detailsData.tollPlazaId"
                                           placeholder="收费广场名称"></el-input>
                             </el-tooltip>
                         </el-form-item>
                         <el-form-item label="收费车道编号：">
-                            <el-tooltip :content="detailsData.tollLaneId?detailsData.tollLaneId: '收费车道编号'" placement="top-start" effect="light">
-                                <el-input :disabled="true" v-model="detailsData.tollLaneId" placeholder="收费车道编号"></el-input>
+                            <el-tooltip :content="detailsData.tollLaneId?detailsData.tollLaneId: '收费车道编号'"
+                                        placement="top-start" effect="light">
+                                <el-input :disabled="true" v-model="detailsData.tollLaneId"
+                                          placeholder="收费车道编号"></el-input>
                             </el-tooltip>
                         </el-form-item>
                         <el-form-item label="添加时间：">
                             <el-tooltip :content="detailsData.insertTime" placement="top-start" effect="light">
-                                <el-input :disabled="true" v-model="detailsData.insertTime" placeholder="添加时间"></el-input>
+                                <el-input :disabled="true" v-model="detailsData.insertTime"
+                                          placeholder="添加时间"></el-input>
                             </el-tooltip>
+                        </el-form-item>
+                        <el-form-item v-if="this.$cookie.get('roleName') && this.$cookie.get('roleName')=='超级管理员'">
+                            <el-button type="danger" @click="removeBinding">解除绑定</el-button>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -285,6 +296,7 @@
     import {Decrypt, Encrypt} from '../../uitls/crypto';
     import {getDataTime} from '@/assets/js/time' // 获取当前时间
     import {
+        BIND_RELEASE,
         PAGE_STATION,
         PAGE_PLAZA,
         PAGE_LANE,
@@ -311,6 +323,7 @@
                 addVisible: false, // 添加设备显示
                 detailsVisible: false, //详情显示
                 flag: 1,
+                removeDeviceId: '', // 解除绑定
                 deployTitleName: '',
                 // 表单数据
                 formItem: {
@@ -385,13 +398,47 @@
             pages
         },
         methods: {
-            settime (row) {
+            settime(row) {
                 // 编辑 table 备案时间
-                return   row.replace("T", ' ')
+                return row.replace("T", ' ')
+            },
+            removeBinding() {
+                var _t =  this;
+                // 解除绑定
+                this.$confirm('此操作将解除绑定, 是否继续?', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    const params = {
+                        deviceId: _t.removeDeviceId,
+                        accessToken: _t.$cookie.get('accessToken'),
+                        openId: _t.$cookie.get('openId'),
+                    };
+                    var filename = BIND_RELEASE + getDataTime() + '.json';
+                    var data = this.changeData(params, filename, _t.$cookie.get('accessToken'));
+                    _t.$api.post('api/json', data, function (res) {
+                        if (res.statusCode == 0) {
+                            _t.alertDialogTip(_t, res.errorMsg)
+                            _t.refreshHandle();
+                            _t.detailsVisible = false;
+                        } else {
+                            _t.alertDialogTip(_t, res.errorMsg)
+                        }
+                    })
+                }).catch(() => {
+                    _t.$message({
+                        type: 'info',
+                        offset: 200,
+                        message: '取消成功'
+                    });
+                })
+
             },
             StatusChange(row) {
                 // 部署状态
                 this.refreshHandle()
+
             },
             changeProvince(val) {
                 // 联动 省份
@@ -470,6 +517,7 @@
             },
             details(row) {
                 // 详情
+                this.removeDeviceId = row.deviceId;
                 this.detailsVisible = true;
                 var _t = this;
                 const params = {
@@ -516,7 +564,7 @@
                     if (valid) {
                         var _t = this
                         const params = {
-                            deviceId: this.deviceId,
+                            deviceId: _t.deviceId,
                             stationId: _t.deployAg.stationId, // 收费车站
                             province: _t.deployAg.province, // 省份
                             tollPlazaId: _t.deployAg.tollPlazaId,// 收费广场
@@ -535,6 +583,8 @@
                                 _t.deployVisible = false;
                                 _t.show = false;
                                 _t.showtext = ''
+                            } else {
+                                _t.alertDialogTip(_t, res.errorMsg)
                             }
                         })
                     }
@@ -590,7 +640,7 @@
                             _t.$message({
                                 offset: 200,
                                 type: 'success',
-                                message: '取消部署成功!'
+                                message: '部署成功!'
                             });
                         } else {
                             _t.alertDialogTip(_t, res.errorMsg)
@@ -600,12 +650,12 @@
                     _t.$message({
                         type: 'info',
                         offset: 200,
-                        message: '取消成功'
+                        message: '取消部署成功'
                     });
                 });
 
             },
-            resetData () {
+            resetData() {
                 this.addVisible = false;
                 this.deployVisible = false;
                 this.detailsVisible = false;
@@ -663,27 +713,33 @@
                 var _t = this;
                 _t.$refs.addList.validate((valid) => {
                     if (valid) {
-                        const seNoData = _t.addEdit.deviceId.split('@')[1]
-                        const params = {
-                            accessToken: _t.$cookie.get('accessToken'),
-                            openId: _t.$cookie.get('openId'),
-                            deviceId: _t.addEdit.deviceId, //	设备编号
-                            seNo: seNoData, //		设备se芯片编号
-                        };
-                        var filename = BIND_CONFIRM + getDataTime() + '.json';
-                        var data = this.changeData(params, filename, _t.$cookie.get('accessToken'));
-                        _t.$api.post('api/json', data, function (res) {
-                            if (res.statusCode == 0) {
-                                _t.addVisible = false;
-                                _t.stationIdList = JSON.parse(res.bizContent).data;
-                                _t.alertDialogTip(_t, res.errorMsg)
-                                _t.refreshHandle();
-                                _t.clearCache();
-                            } else {
-                                _t.alertDialogTip(_t, res.errorMsg)
-                                _t.clearCache();
-                            }
-                        })
+
+                        if (_t.addEdit.deviceId.indexOf("@") != -1) {
+                            const seNoData = _t.addEdit.deviceId.split('@')[1];
+                            const params = {
+                                accessToken: _t.$cookie.get('accessToken'),
+                                openId: _t.$cookie.get('openId'),
+                                deviceId: _t.addEdit.deviceId, //	设备编号
+                                seNo: seNoData, //		设备se芯片编号
+                            };
+                            var filename = BIND_CONFIRM + getDataTime() + '.json';
+                            var data = this.changeData(params, filename, _t.$cookie.get('accessToken'));
+                            _t.$api.post('api/json', data, function (res) {
+                                if (res.statusCode == 0) {
+                                    _t.addVisible = false;
+                                    _t.stationIdList = JSON.parse(res.bizContent).data;
+                                    _t.alertDialogTip(_t, res.errorMsg)
+                                    _t.refreshHandle();
+                                    _t.clearCache();
+                                } else {
+                                    _t.alertDialogTip(_t, res.errorMsg)
+                                    _t.clearCache();
+                                }
+                            })
+                        } else {
+                            _t.alertDialogTip(_t, '输入设备编号格式错误!')
+                        }
+
                     }
                 })
 
@@ -709,11 +765,11 @@
                         setTimeout(() => {
                             _t.$store.commit('set_loading', false);
                         }, 800);
-                        _t.tableData = JSON.parse(res.bizContent).data
+                        _t.tableData = JSON.parse(res.bizContent).data ? JSON.parse(res.bizContent).data : [];
                         var pages = JSON.parse(res.bizContent).totalCount
                         // console.log(JSON.parse(res.bizContent), '123');
                         _t.options.total = pages ? pages : 0;
-                    }else {
+                    } else {
                         _t.alertDialogTip(_t, res.errorMsg)
                     }
 

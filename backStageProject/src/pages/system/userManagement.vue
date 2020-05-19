@@ -353,14 +353,16 @@
                         setTimeout(() => {
                             _t.$store.commit('set_loading', false);
                         }, 800);
-                        if (JSON.parse(res.bizContent).data) {
-                            _t.disposeData(JSON.parse(res.bizContent).data)
-                            var pages = JSON.parse(res.bizContent).totalCount
-                            _t.options.total = pages ? pages : 0;
-                        }else {
-                             _t.tableData = [];
-                            _t.alertDialogTip(_t,'查询数据为空！')
-                        }
+                        const list = JSON.parse(res.bizContent).data?JSON.parse(res.bizContent).data:[];
+                        _t.disposeData(list)
+                        var pages = JSON.parse(res.bizContent).totalCount
+                        _t.options.total = pages ? pages : 0;
+                        // if (JSON.parse(res.bizContent).data) {
+                        //
+                        // }else {
+                        //      _t.tableData = [];
+                        //     // _t.alertDialogTip(_t,'查询数据为空！')
+                        // }
 
                     }else {
                         _t.alertDialogTip(_t, res.errorMsg)
@@ -392,7 +394,7 @@
                 this.formItem.phoneNumber = ''; // 手机号
                 this.formItem.nickname = ''; // 昵称
                 this.formItem.user = ''; // 角色
-
+                this.refreshHandle();
             },
             changeRoleBtn(row) {
                 // 修改

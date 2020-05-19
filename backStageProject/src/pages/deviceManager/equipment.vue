@@ -89,7 +89,7 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="设备编号：" prop="deviceId">
-                    <el-input  clearable maxlength="150" v-model="addEdit.deviceId" placeholder="设备编号"></el-input>
+                    <el-input  clearable maxlength="50" v-model="addEdit.deviceId" placeholder="设备编号"></el-input>
                 </el-form-item>
 <!--                <el-form-item label="SE芯片编号：" prop="seNo">-->
 <!--                    <el-input  clearable maxlength="150" v-model="addEdit.seNo" placeholder="芯片编号"></el-input>-->
@@ -339,30 +339,33 @@
 
                 _t.$refs.addDevice.validate((valid) => {
                     if(valid) {
-                        const seNodata = _t.addEdit.deviceId.split('@')[1]
-                        const params = {
-                            accessToken: _t.$cookie.get('accessToken'),
-                            openId: _t.$cookie.get('openId'),
-                            deviceId: _t.addEdit.deviceId.trim(), //	设备编号
-                            factory: _t.addEdit.factory, //		设备厂商
-                            model: _t.addEdit.model, //		设备型号
-                            seNo: seNodata, //		设备se芯片编号
-                        };
-                        console.log(params);
-                        var filename = addEquipmentDevice + getDataTime() + '.json';
-                        var data = this.changeData(params, filename,_t.$cookie.get('accessToken'));
-                        _t.$api.post('api/json', data, function (res) {
-                            if (res.statusCode == 0) {
-                                _t.addVisible = false;
-                                _t.stationIdList = JSON.parse(res.bizContent).data;
-                                _t.alertDialogTip(_t, res.errorMsg);
-                                _t.refreshHandle();
-                                _t.resetCode();
-                            } else {
-                                _t.alertDialogTip(_t, res.errorMsg);
-                                // _t.resetCode();
-                            }
-                        })
+                        if(_t.addEdit.deviceId.indexOf('@')!=-1) {
+                            const seNodata = _t.addEdit.deviceId.split('@')[1]
+                            const params = {
+                                accessToken: _t.$cookie.get('accessToken'),
+                                openId: _t.$cookie.get('openId'),
+                                deviceId: _t.addEdit.deviceId.trim(), //	设备编号
+                                factory: _t.addEdit.factory, //		设备厂商
+                                model: _t.addEdit.model, //		设备型号
+                                seNo: seNodata, //		设备se芯片编号
+                            };
+                            var filename = addEquipmentDevice + getDataTime() + '.json';
+                            var data = this.changeData(params, filename,_t.$cookie.get('accessToken'));
+                            _t.$api.post('api/json', data, function (res) {
+                                if (res.statusCode == 0) {
+                                    _t.addVisible = false;
+                                    _t.stationIdList = JSON.parse(res.bizContent).data;
+                                    _t.alertDialogTip(_t, res.errorMsg);
+                                    _t.refreshHandle();
+                                    _t.resetCode();
+                                } else {
+                                    _t.alertDialogTip(_t, res.errorMsg);
+                                    // _t.resetCode();
+                                }
+                            })
+                        }else {
+                            _t.alertDialogTip(_t, '输入设备编号格式错误!')
+                        }
                     }
                 })
             },
@@ -387,7 +390,7 @@
                         setTimeout(() => {
                             _t.$store.commit('set_loading', false);
                         }, 800);
-                        _t.tableData = JSON.parse(res.bizContent).data
+                        _t.tableData = JSON.parse(res.bizContent).data? JSON.parse(res.bizContent).data:[];
                         var pages = JSON.parse(res.bizContent).totalCount
                         // console.log(JSON.parse(res.bizContent), '123');
                         _t.options.total = pages ? pages : 0;
