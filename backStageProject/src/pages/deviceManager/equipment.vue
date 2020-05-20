@@ -375,10 +375,10 @@
                 const params = {
                     accessToken: _t.$cookie.get('accessToken'),
                     openId: _t.$cookie.get('openId'),
-                    deviceId: _t.formItem.equipmentNumber,	//设备编号
-                    factory: _t.formItem.manufacturer,	//	设备厂商
-                    status: _t.formItem.deviceStatus,	//	设备状态
-                    seNo: _t.formItem.chipNumber, //芯片编号
+                    deviceId: _t.formItem.equipmentNumber.trim(),	//设备编号
+                    factory: _t.formItem.manufacturer.trim(),	//	设备厂商
+                    status: _t.formItem.deviceStatus.trim(),	//	设备状态
+                    seNo: _t.formItem.chipNumber.trim(), //芯片编号
                     pageNo: _t.options.currentPage, // 当前页
                     pageSize: _t.options.pageSize, // 显示条数
                 };

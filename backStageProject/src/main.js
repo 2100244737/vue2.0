@@ -27,6 +27,10 @@ import debounce from 'v-debounce-throttle'
 
 // 获取时间
 import {getTime} from "./assets/js/time";
+// 复制功能
+import VueClipboard from 'vue-clipboard2'
+import JSONView from 'vue-json-viewer'
+
 // 调用api接口
 Vue.prototype.$api = axios;
 Vue.prototype.$md5 = md5;
@@ -46,7 +50,10 @@ Vue.prototype.changeData = function (content,filename,token){
   }
   return params
 }
-
+// json 高亮
+Vue.use(JSONView)
+//  复制挂载全局
+Vue.use(VueClipboard)
 // 挂载全局
 Vue.use(ElementUI);
 //  cookie 挂载到全局

@@ -31,6 +31,9 @@
                     <el-button class="showBtn" v-show="showBtn" type="danger" icon="el-icon-delete" @click="stopMap">
                         关闭地图
                     </el-button>
+                    <el-button class="showBtn" v-show="logBtn" type="danger" icon="el-icon-delete" @click="stoplog">
+                        关闭日志
+                    </el-button>
                     <el-button type="info" icon="el-icon-refresh-left" @click="resetHandle">重置</el-button>
 
                 </el-form-item>
@@ -44,10 +47,12 @@
                 <el-table-column label="操作" header-align="center" align="center">
                     <template slot-scope="scope">
                         <el-button type="primary" @click="lookMap(scope.row)">查看地图</el-button>
+                        <el-button type="primary" @click="lookLog(scope.row)">查看日志</el-button>
                     </template>
                 </el-table-column>
             </el-table>
             <pages
+
                 class="pages"
                 :total='options.total'
                 :currentPage='options.currentPage'
@@ -55,6 +60,47 @@
                 @handleSizeChangeSub="handleSizeChangeSub"
                 @handleCurrentChangeSub="handleCurrentChange"/>
         </div>
+
+        <div v-show="logShow" class="tableWp marginTop2">
+            <el-table :data="logShowData" border stripe>
+                <el-table-column type="index" width="50px" label="序号" header-align="center" align="center"/>
+                <el-table-column prop="fileName" label="数据名称" header-align="center" align="center"/>
+                <el-table-column label="操作" header-align="center" align="center">
+                    <template slot-scope="scope">
+                        <el-button type="primary" @click="looklook(scope.row)">查看</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
+        <el-dialog :visible.sync="dialogTableVisible">
+
+            <span slot="footer" class="dialog-footer">
+
+            </span>
+        </el-dialog>
+        <el-dialog
+            append-to-body
+            :close-on-click-modal="true"
+            :close-on-press-escape="false"
+            :before-close="clear"
+            :visible.sync="dialogTableVisible">
+            <div slot="title" class="dialogTitle clearFix">
+                <span class="title">详情查看</span>
+            </div>
+<!--            <pre>{{json}}</pre>-->
+            <json-viewer
+                :value="json"
+                :expand-depth="5"
+                boxed
+                sort
+            ></json-viewer>
+            <div slot="footer">
+                <el-button  @click="clear">关 闭</el-button>
+                <el-button   v-clipboard:copy="json"
+                             v-clipboard:success="onCopy"
+                             v-clipboard:error="onError" type="primary" @click="copy">复制JSON</el-button>
+            </div>
+        </el-dialog>
         <div class="iframe marginTop2">
             <iframe id="iframe" v-if="show" src="/static/view.html"
                     height="600px"
@@ -70,7 +116,11 @@
         name: 'pathQuery',
         data() {
             return {
+                pagesShow: true,
+                logShow: false, // 查看日志
+                logBtn: false, // 关闭日志
                 tableData: [],// 表格数据
+                logShowData: [], //
                 dataList: {
                     color: '',
                     time: '', // 上传时间
@@ -81,16 +131,16 @@
                     carNumber: [
                         {required: true, message: '请输入车牌号', trigger: 'blur'},
                     ],
-                    time: [
-                        {required: true, message: '请输入上传时间', trigger: 'change'},
-                        {required: true, message: '请输入上传时间', trigger: 'blur'},
-                    ],
-                    // entrance: [
-                    //     {required: true, message: '请输入入口时间', trigger: 'blur'},
+                    // time: [
+                    //     {required: true, message: '请输入上传时间', trigger: 'change'},
+                    //     {required: true, message: '请输入上传时间', trigger: 'blur'},
                     // ],
-                    color: [
-                        {required: true, message: '请输入车牌颜色', trigger: 'change'},
-                    ],
+                    // // entrance: [
+                    // //     {required: true, message: '请输入入口时间', trigger: 'blur'},
+                    // // ],
+                    // color: [
+                    //     {required: true, message: '请输入车牌颜色', trigger: 'change'},
+                    // ],
                 },
                 show: false,
                 tableShow: true,
@@ -109,6 +159,115 @@
             pages
         },
         methods: {
+            copy () {
+
+            },
+            onCopy () {
+               // copy 成功
+                this.$message({
+                    message: '复制成功',
+                    type: 'success',
+                    offset: 200
+                });
+            },
+            onError () {
+                // copy 失败
+                this.$message({
+                    message: '复制失败',
+                    type: 'warning',
+                    offset: 200
+                });
+            },
+            clear () {
+                //  关闭
+                this.json = ''
+               this.dialogTableVisible = false; //
+            },
+            looklook (row) {
+                // 查看
+                var _t = this;
+                _t.dialogTableVisible = true; //
+                const selectedData = {
+                    fileId: row.fileId
+                }
+
+                const params = {
+                    "bizContent": JSON.stringify(selectedData),
+                    "encryptType": "NONE",
+                    "filename": "FCS_LOG_FIND_REQ_99999917_20200306170243825.json",
+                    "sign": "NONE",
+                    "signType": "NONE",
+                    "timestamp": "2020-04-06T17:02:44",
+                    "tokenType": "USER_AUTH",
+                    "accessToken": "chinaetcorg"
+                }
+                axios.post('/c/fcs/api/json', params).then(function (response) {
+                    if (response.data.statusCode != 0) {
+                        _t.$confirm(response.data.errorMsg, '查询日志失败', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        })
+                    }
+                    const data = JSON.parse(response.data.bizContent)
+                    _t.json = data.jsonStr
+
+                }).catch(function (error) {
+                    console.log(error);
+                });
+
+            },
+            stoplog () {
+                var _t = this;
+                _t.logShow = false;
+                _t.logBtn = false;
+                _t.tableShow = true;
+                _t.pagesShow = true
+            },
+            lookLog (row){
+                // 查看日志
+                var _t = this;
+                _t.logShow = true;
+                _t.tableShow = false;
+                _t.logBtn = true;
+                // 查询 数据
+                const selectedData = {
+                    enTime: row.enTime,
+                    plateNum: row.plateNum,
+                    plateColor: row.plateColor, // 转Number
+                    insertDate: row.uploadTime
+                }
+                // 数据处理
+                const params = {
+                    "bizContent": JSON.stringify(selectedData),
+                    "encryptType": "NONE",
+                    "filename": "FCS_LOG_LIST_REQ_99999917_20200306170243825.json",
+                    "sign": "NONE",
+                    "signType": "NONE",
+                    "timestamp": "2020-03-06T17:02:44",
+                    "tokenType": "USER_AUTH",
+                    "accessToken": "chinaetcorg"
+                }
+                //https://feelog.txffp.com/fcs/api/json
+                axios.post('/c/fcs/api/json', params).then(function (response) {
+                    if (response.data.statusCode != 0) {
+                        _t.$confirm(response.data.errorMsg, '查询日志失败', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        })
+                        _t.logBtn = false;
+                        _t.logShow = false;
+                        _t.tableShow = true;
+                    }else {
+                        console.log(response);
+                        const data = JSON.parse(response.data.bizContent)
+                        _t.logShowData = data.uploadModels
+                    }
+                }).catch(function (error) {
+                    console.log(error);
+                });
+            },
             stopMap() {
                 // 关闭地图
                 this.showBtn = false;
@@ -126,6 +285,11 @@
                 _t.dataList.time = ""; // 上传时间
                 _t.dataList.entrance = ""; // 入口时间
                 _t.dataList.carNumber = "";
+               _t.dialogTableVisible = false; //
+               _t.logBtn = false; //
+               _t.logShow = false; //
+                _t.json = ''
+                _t.pagesShow = true
             },
             getData() {
                 var _t = this;
@@ -154,6 +318,7 @@
                             "tokenType": "USER_AUTH",
                             "accessToken": _t.$cookie.get('accessToken'),
                         }
+
                         axios.post('/b/api/json', params).then(function (response) {
                             if (response.data.statusCode == 0) {
                                 _t.tableData = JSON.parse(response.data.bizContent).data
@@ -168,16 +333,17 @@
                 })
             },
             lookMap(row) {
+                //查看地图
                 var _t = this
                 sessionStorage.removeItem("JSON")
                 _t.show = false;
                 _t.showBtn = true;
                 _t.$store.commit('set_loading', true);
-                //查看地图
-                const time = row.enTime.replace(/:/g, "-")
+
+                const time = row.enTime.replace(/:/g, "-");
                 const selectedData = {
                     openId: _t.$cookie.get('openId'),
-                    fileId: _t.dataList.time + "/" + time + "_" + _t.dataList.carNumber + '_' + _t.dataList.color
+                    fileId: row.uploadTime + "/" + time + "_" + row.plateNum + '_' + row.plateColor
                 }
                 sessionStorage.setItem("JSON", JSON.stringify(selectedData))
                 const params = {
@@ -195,6 +361,10 @@
                 axios.post('/b/api/json', params).then(function (response) {
                     if (response.data.statusCode != 0) {
                         _t.alertDialogTip(_t, '查询日志失败')
+                        setTimeout(() => {
+                            _t.$store.commit('set_loading', false);
+                        }, 500);
+                        _t.showBtn = false
                     } else {
                         if (response.data.bizContent) {
                             setTimeout(() => {
@@ -206,6 +376,10 @@
                             _t.show = true
 
                         } else {
+                            setTimeout(() => {
+                                _t.$store.commit('set_loading', false);
+                            }, 500);
+                            _t.showBtn = false
                             _t.alertDialogTip(_t, '此文件无法查看地图')
                         }
 

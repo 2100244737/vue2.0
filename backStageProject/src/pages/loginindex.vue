@@ -14,6 +14,7 @@
                         id="username"
                         ref="username"
                         autofocus
+                        clearable
                         prefix-icon="el-icon-user-solid"
                         v-model="loginForm.username"
                         placeholder="请输入手机号"

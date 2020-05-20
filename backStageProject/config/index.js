@@ -11,11 +11,10 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/', //  修改打包路径
     proxyTable: {
-        // https//device.cywetc.com/fcs/api/json
       '/api': {
-        target: 'http://10.1.0.223',
-        //   target: 'https://testgw.cywetc.com',
-        //   target: 'https//device.cywetc.com/fcs',
+          target: 'https://testgw.cywetc.com',
+          // target: 'http://10.1.0.223',
+        // target: 'https//device.cywetc.com/fcs',
         changeOrigin: true,
         pathRewrite: {
           '/api': '/'
@@ -23,11 +22,21 @@ module.exports = {
       },
         '/b': {
         target: 'http://10.1.0.223',
-        //   target: 'https://testgw.cywetc.com',
-        //   target: 'https//device.cywetc.com/fcs',
+         // target: 'https://testgw.cywetc.com',
+         // target: 'https//device.cywetc.com/fcs',
         changeOrigin: true,
         pathRewrite: {
           '/b': '/'
+        }
+      },
+        '/c': {
+         target: 'https://feelog.txffp.com',
+          //
+          // target: 'https://testgw.cywetc.com',
+        //   target: 'https//device.cywetc.com/fcs',
+        changeOrigin: true,
+        pathRewrite: {
+          '/c': '/'
         }
       }
     },

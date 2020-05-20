@@ -330,6 +330,7 @@
                     equipmentNumber: '', // 设备编号
                     deviceStatus: '', // 设备状态
                     manufacturer: '', // 厂商
+                    state: '', //设备se芯片编号
                 },
                 rules: {
                     deviceId: [
@@ -719,8 +720,8 @@
                             const params = {
                                 accessToken: _t.$cookie.get('accessToken'),
                                 openId: _t.$cookie.get('openId'),
-                                deviceId: _t.addEdit.deviceId, //	设备编号
-                                seNo: seNoData, //		设备se芯片编号
+                                deviceId: _t.addEdit.deviceId.trim(), //	设备编号
+                                seNo: seNoData.trim(), //		设备se芯片编号
                             };
                             var filename = BIND_CONFIRM + getDataTime() + '.json';
                             var data = this.changeData(params, filename, _t.$cookie.get('accessToken'));
@@ -748,8 +749,8 @@
                 // 查询功能
                 var _t = this
                 const params = {
-                    deviceId: _t.formItem.equipmentNumber,
-                    seNo: _t.formItem.state,
+                    deviceId: _t.formItem.equipmentNumber.trim(),
+                    seNo: _t.formItem.state.trim(),
                     status: _t.formItem.deviceStatus,
                     factory: _t.formItem.manufacturer,
                     accessToken: _t.$cookie.get('accessToken'),

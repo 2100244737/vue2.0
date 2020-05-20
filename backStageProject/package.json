@@ -18,7 +18,9 @@
     "normalize.css": "^8.0.1",
     "postcss-px2rem-exclude": "0.0.6",
     "vue": "^2.5.2",
+    "vue-clipboard2": "^0.3.1",
     "vue-cookie": "^1.1.4",
+    "vue-json-viewer": "^2.2.11",
     "vue-router": "^3.0.1",
     "vuex": "^3.3.0"
   },
