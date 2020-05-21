@@ -41,7 +41,6 @@ function apiAxios(method, url, params, success) {
             // 'token': getCookie('WJE_USER_TOKEN') || ''
         }
     }).then(function (res) {
-
 // 成功时回调
         if (success) {
             // 全局提示敏感词汇
@@ -60,6 +59,8 @@ function apiAxios(method, url, params, success) {
                     _this.$router.push('/login')
                   return false
                 });
+            }else if(res.data.statusCode == 702) {
+                // _this.$router.push('/login')
             } else {
                 // 成功
                 MessageBox.alert(res.data.errorMsg);
@@ -71,6 +72,20 @@ function apiAxios(method, url, params, success) {
         return false;
     });
 }
+axios.interceptors.request.use(
+    config => {
+        // 该处可以将config打印出来看一下，该部分将发送给后端（server端）
+        if (!_this.$cookie.get('openId')) {
+            _this.$router.push('/login')
+        }
+        return config  // 对config处理完后返回，下一步将向后端发送请求
+    },
+    error => {  // 当发生错误时，执行该部分代码
+        console.log(error); //调试用
+        return Promise.reject(error)
+    }
+)
+
 // 响应拦截（配置请求回来的信息）
 axios.interceptors.response.use(function (response) {
     // 处理响应数据

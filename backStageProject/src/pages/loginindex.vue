@@ -1,10 +1,10 @@
 <template>
-    <div class="login-container">
+    <div  class="login-container">
         <div class="box">
-            <div class="IMgheader">
+            <div ref="add" class="IMgheader">
                 <img class="img" src="../assets/img/logo.png" alt="">
             </div>
-            <el-form ref="loginForm" :rules="rules" :model="loginForm" class="login-form width" autocomplete="on"
+            <el-form  ref="loginForm" :rules="rules" :model="loginForm" class="login-form width" autocomplete="on"
                      label-position="left">
                 <div class="title-container">
                     <h3 class="title">用户登录</h3>
@@ -86,6 +86,7 @@
             // input 聚焦
             const username = document.getElementById('username')
             username.focus()
+            this.dome()
         },
         methods: {
             clearCache() {
@@ -118,17 +119,14 @@
                     code: _t.loginForm.password
                 };
                 // const sha256 = require("js-sha256").sha256; //引入sha256库
-                // console.log(sha256(src));
-                // console.log(1111);
                 // var src = JSON.stringify(params)
-                // console.log(_t.$md5(src,'123456'), '222');
                 const token = 'chinaetcorg'
                 var filename = loginfile + getDataTime() + '.json';
                 var data = _t.changeData(params, filename,token);
                 _t.$api.post('api/json', data, function (res) {
                     if (res.statusCode == 0) {
                         var menuList = JSON.parse(res.bizContent).menus
-                        sessionStorage.setItem("MENU_LIST", JSON.stringify(menuList));
+                        localStorage.setItem("MENU_LIST", JSON.stringify(menuList));
                         _t.$message({
                             message: '登录成功！',
                             offset: 200,
@@ -218,7 +216,6 @@
                 return endArr
             },
             dome() {
-                console.log(1111);
                 // var dataList =this.menuList.pages.concat(this.menuList.menus);
                 // console.log(dataList);
                 // console.log(this.toTree(dataList), '123');
@@ -230,7 +227,7 @@
             this.$cookie.delete('phone');
             this.$cookie.delete('username');
            this.$cookie.delete('roleName');
-            sessionStorage.removeItem("MENU_LIST");
+            localStorage.removeItem("MENU_LIST");
         }
     }
 </script>

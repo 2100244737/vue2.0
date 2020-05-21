@@ -124,7 +124,7 @@
                 this.device = false;
                 // 设备部署
                 this.deploy = false;
-                var menuList = JSON.parse(sessionStorage.getItem("MENU_LIST"));
+                var menuList = JSON.parse(localStorage.getItem("MENU_LIST"));
                 menuList.forEach((item, index) => {
 
                     if (item.parent == 'system') {

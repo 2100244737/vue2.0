@@ -87,18 +87,21 @@
             <div slot="title" class="dialogTitle clearFix">
                 <span class="title">详情查看</span>
             </div>
-<!--            <pre>{{json}}</pre>-->
+            <!--            <pre>{{json}}</pre>-->
             <json-viewer
                 :value="json"
                 :expand-depth="5"
+                :copyable="{copyText: '点击复制', copiedText: '复制成功', timeout: 1000}"
                 boxed
                 sort
             ></json-viewer>
             <div slot="footer">
-                <el-button  @click="clear">关 闭</el-button>
-                <el-button   v-clipboard:copy="json"
-                             v-clipboard:success="onCopy"
-                             v-clipboard:error="onError" type="primary" @click="copy">复制JSON</el-button>
+                <el-button @click="clear">关 闭</el-button>
+                <el-button type="primary" @click="download">下载</el-button>
+<!--                <el-button v-clipboard:copy="json"-->
+<!--                           v-clipboard:success="onCopy"-->
+<!--                           v-clipboard:error="onError" type="primary" @click="copy">复制JSON-->
+<!--                </el-button>-->
             </div>
         </el-dialog>
         <div class="iframe marginTop2">
@@ -147,6 +150,7 @@
                 showBtn: false,
                 dialogTableVisible: false,
                 json: '',
+                jsonName: '',
                 // 分页
                 options: {
                     total: 0, // 总条数
@@ -159,18 +163,38 @@
             pages
         },
         methods: {
-            copy () {
+            download() {
+                var _t = this;
+                const content = JSON.stringify(_t.json);
+                const blob = new Blob([content]);
+                const fileName =   _t.jsonName + ".json";
+                if ("download" in document.createElement("a")) {
+                    // 非IE下载
+                    const elink = document.createElement("a");
+                    elink.download = fileName;
+                    elink.style.display = "none";
+                    elink.href = URL.createObjectURL(blob);
+                    document.body.appendChild(elink);
+                    elink.click();
+                    URL.revokeObjectURL(elink.href); // 释放URL 对象
+                    document.body.removeChild(elink);
+                } else {
+                    // IE10+下载
+                    navigator.msSaveBlob(blob, fileName);
+                }
+            },
+            copy() {
 
             },
-            onCopy () {
-               // copy 成功
+            onCopy() {
+                // copy 成功
                 this.$message({
                     message: '复制成功',
                     type: 'success',
                     offset: 200
                 });
             },
-            onError () {
+            onError() {
                 // copy 失败
                 this.$message({
                     message: '复制失败',
@@ -178,15 +202,15 @@
                     offset: 200
                 });
             },
-            clear () {
+            clear() {
                 //  关闭
                 this.json = ''
-               this.dialogTableVisible = false; //
+                this.dialogTableVisible = false; //
             },
-            looklook (row) {
-                // 查看
+            looklook(row) {
+                // 查看JOSN
                 var _t = this;
-                _t.dialogTableVisible = true; //
+                _t.jsonName = row.fileName
                 const selectedData = {
                     fileId: row.fileId
                 }
@@ -201,36 +225,49 @@
                     "tokenType": "USER_AUTH",
                     "accessToken": "chinaetcorg"
                 }
-                axios.post('/c/fcs/api/json', params).then(function (response) {
-                    if (response.data.statusCode != 0) {
-                        _t.$confirm(response.data.errorMsg, '查询日志失败', {
+                _t.$api.post('api/json', params, function (response) {
+                    if (response.statusCode != 0) {
+                        _t.$confirm(response.errorMsg, '查询JSON失败', {
                             confirmButtonText: '确定',
                             cancelButtonText: '取消',
                             type: 'warning'
                         })
+                    }else {
+                        _t.dialogTableVisible = true; //
+                        const data = JSON.parse(response.bizContent)
+                        _t.json = JSON.parse(data.jsonStr)
                     }
-                    const data = JSON.parse(response.data.bizContent)
-                    _t.json = data.jsonStr
-
-                }).catch(function (error) {
-                    console.log(error);
-                });
+                })
+                // _t.$api.post('/api/json', params).then(function (response) {
+                //     if (response.data.statusCode != 0) {
+                //         _t.$confirm(response.data.errorMsg, '查询JSON失败', {
+                //             confirmButtonText: '确定',
+                //             cancelButtonText: '取消',
+                //             type: 'warning'
+                //         })
+                //     }else {
+                //         _t.dialogTableVisible = true; //
+                //         const data = JSON.parse(response.data.bizContent)
+                //         _t.json = JSON.parse(data.jsonStr)
+                //     }
+                // }).catch(function (error) {
+                //     console.log(error);
+                // });
 
             },
-            stoplog () {
+            stoplog() {
                 var _t = this;
                 _t.logShow = false;
                 _t.logBtn = false;
                 _t.tableShow = true;
                 _t.pagesShow = true
             },
-            lookLog (row){
+            lookLog(row) {
                 // 查看日志
                 var _t = this;
                 _t.logShow = true;
                 _t.tableShow = false;
                 _t.logBtn = true;
-                // 查询 数据
                 const selectedData = {
                     enTime: row.enTime,
                     plateNum: row.plateNum,
@@ -249,8 +286,8 @@
                     "accessToken": "chinaetcorg"
                 }
                 //https://feelog.txffp.com/fcs/api/json
-                axios.post('/c/fcs/api/json', params).then(function (response) {
-                    if (response.data.statusCode != 0) {
+                _t.$api.post('api/json', params, function (response) {
+                    if (response.statusCode != 0) {
                         _t.$confirm(response.data.errorMsg, '查询日志失败', {
                             confirmButtonText: '确定',
                             cancelButtonText: '取消',
@@ -259,14 +296,28 @@
                         _t.logBtn = false;
                         _t.logShow = false;
                         _t.tableShow = true;
-                    }else {
-                        console.log(response);
-                        const data = JSON.parse(response.data.bizContent)
+                    } else {
+                        const data = JSON.parse(response.bizContent)
                         _t.logShowData = data.uploadModels
                     }
-                }).catch(function (error) {
-                    console.log(error);
-                });
+                })
+                // axios.post('/api/json', params).then(function (response) {
+                //     if (response.data.statusCode != 0) {
+                //         _t.$confirm(response.data.errorMsg, '查询日志失败', {
+                //             confirmButtonText: '确定',
+                //             cancelButtonText: '取消',
+                //             type: 'warning'
+                //         })
+                //         _t.logBtn = false;
+                //         _t.logShow = false;
+                //         _t.tableShow = true;
+                //     } else {
+                //         const data = JSON.parse(response.data.bizContent)
+                //         _t.logShowData = data.uploadModels
+                //     }
+                // }).catch(function (error) {
+                //     console.log(error);
+                // });
             },
             stopMap() {
                 // 关闭地图
@@ -285,11 +336,12 @@
                 _t.dataList.time = ""; // 上传时间
                 _t.dataList.entrance = ""; // 入口时间
                 _t.dataList.carNumber = "";
-               _t.dialogTableVisible = false; //
-               _t.logBtn = false; //
-               _t.logShow = false; //
+                _t.dialogTableVisible = false; //
+                _t.logBtn = false; //
+                _t.logShow = false; //
                 _t.json = ''
                 _t.pagesShow = true
+                _t.tableData = []
             },
             getData() {
                 var _t = this;
@@ -300,10 +352,12 @@
                         _t.show = false;
                         _t.tableShow = true;
                         _t.showBtn = false;
+                        _t.logShow = false;
+                        _t.logBtn = false;
                         sessionStorage.removeItem("JSON")
                         const selectedData = {
                             openId: _t.$cookie.get('openId'),
-                            plateNum: _t.dataList.carNumber, // 车牌号
+                            plateNum: _t.dataList.carNumber.trim(), // 车牌号
                             plateColor: _t.dataList.color, // 车牌颜色
                             uploadTime: _t.dataList.time, // 上传时间
                         };
@@ -319,15 +373,24 @@
                             "accessToken": _t.$cookie.get('accessToken'),
                         }
 
-                        axios.post('/b/api/json', params).then(function (response) {
-                            if (response.data.statusCode == 0) {
-                                _t.tableData = JSON.parse(response.data.bizContent).data
+                        _t.$api.post('api/json', params, function (res) {
+                            if (res.statusCode == 0) {
+                                 _t.tableData = JSON.parse(res.bizContent).data
                                 // var pages = JSON.parse(response.data.bizContent).totalCount
                                 // _t.options.total = pages ? pages : 0;
                             } else {
-                                _t.alertDialogTip(_t, response.errorMsg)
+                                _t.alertDialogTip(_t, res.errorMsg)
                             }
                         })
+                        // axios.post('/api/json', params).then(function (response) {
+                        //     if (response.data.statusCode == 0) {
+                        //         _t.tableData = JSON.parse(response.data.bizContent).data
+                        //         // var pages = JSON.parse(response.data.bizContent).totalCount
+                        //         // _t.options.total = pages ? pages : 0;
+                        //     } else {
+                        //         _t.alertDialogTip(_t, response.data.errorMsg)
+                        //     }
+                        // })
 
                     }
                 })
@@ -358,20 +421,20 @@
                     "accessToken": "chinaetcorg",
                 }
                 // https://device.cywetc.com/fcs/api/json
-                axios.post('/b/api/json', params).then(function (response) {
-                    if (response.data.statusCode != 0) {
-                        _t.alertDialogTip(_t, '查询日志失败')
+                _t.$api.post('api/json', params, function (response) {
+                    if (response.statusCode != 0) {
+                        _t.alertDialogTip(_t, '查询地图失败')
                         setTimeout(() => {
                             _t.$store.commit('set_loading', false);
                         }, 500);
                         _t.showBtn = false
                     } else {
-                        if (response.data.bizContent) {
+                        if (response.bizContent) {
                             setTimeout(() => {
                                 _t.$store.commit('set_loading', false);
                             }, 500);
                             _t.tableShow = false;
-                            const data = JSON.parse(response.data.bizContent)
+                            const data = JSON.parse(response.bizContent)
                             sessionStorage.setItem("JSON", JSON.stringify(data))
                             _t.show = true
 
@@ -384,10 +447,37 @@
                         }
 
                     }
-
-                }).catch(function (error) {
-                    console.log(error);
-                });
+                })
+                // axios.post('/api/json', params).then(function (response) {
+                //     if (response.data.statusCode != 0) {
+                //         _t.alertDialogTip(_t, '查询地图失败')
+                //         setTimeout(() => {
+                //             _t.$store.commit('set_loading', false);
+                //         }, 500);
+                //         _t.showBtn = false
+                //     } else {
+                //         if (response.data.bizContent) {
+                //             setTimeout(() => {
+                //                 _t.$store.commit('set_loading', false);
+                //             }, 500);
+                //             _t.tableShow = false;
+                //             const data = JSON.parse(response.data.bizContent)
+                //             sessionStorage.setItem("JSON", JSON.stringify(data))
+                //             _t.show = true
+                //
+                //         } else {
+                //             setTimeout(() => {
+                //                 _t.$store.commit('set_loading', false);
+                //             }, 500);
+                //             _t.showBtn = false
+                //             _t.alertDialogTip(_t, '此文件无法查看地图')
+                //         }
+                //
+                //     }
+                //
+                // }).catch(function (error) {
+                //     console.log(error);
+                // });
 
             },
             handleCurrentChange(val) {
@@ -402,12 +492,6 @@
                 _t.options.pageSize = val;
                 _t.getData()
             },
-            getHenght() {
-                var ifm = document.getElementById("iframepage");
-                var div = document.getElementById("formBox-top");
-                console.log(ifm, '9999');
-                ifm.height = document.documentElement.clientHeight - div.offsetHeight * 2;
-            }
         },
         created() {
             if (!this.$cookie.get('accessToken') || !this.$cookie.get('openId')) {
@@ -423,6 +507,7 @@
 </script>
 
 <style scoped>
+
 
 </style>
 

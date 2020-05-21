@@ -36,16 +36,22 @@
         }
 
         #intervals {
-            padding-left: 0px;
-
+            padding-left: 10px;
+            /* height: 600px;
+              overflow-y: auto; */
             background: #fff;
+            text-align: left;
         }
 
         .left_menu_bg {
             text-align: center;
         }
-         .left_menu {
-             z-index: 9999999;
+
+        .left_menu {
+            z-index: 9999999;
+        }
+         h3 {
+             margin: 5px 0;
          }
         .btn {
             position: fixed;
@@ -58,6 +64,7 @@
             color: #fff;
             z-index: 9999;
         }
+
         .btnShow {
             background: #25A5F7;
             color: #fff;
@@ -65,11 +72,11 @@
             height: 50px;
             border-radius: 15px;
             position: fixed;
-            top :5%;
+            top: 5%;
             right: 5%;
             border: none;
             z-index: 999999999;
-            cursor:pointer;
+            cursor: pointer;
         }
     </style>
     <title>路径还原</title>
@@ -86,7 +93,7 @@
 
 
 <div id="container"></div>
-<button  class="btnShow" id="btnShow">展开</button>
+<button class="btnShow" id="btnShow">展开</button>
 <!-- 路径还原选择 -->
 <div class="left_menu hidden-xs"
      style="padding:0px 0px 0px 0px;height:6%;width:10%;position:fixed; top:10%; left:10% ;">
@@ -106,7 +113,7 @@
 
 <!-- 收费单元 -->
 <div class="left_menu hidden-xs"
-     style="padding:0px 0px 0px 0px;height:6%;width:15%;position:fixed; top:10%; left:80% ; min-height: calc(100% - 160px); height: calc(100% - 120px); overflow-y: hidden;">
+     style="padding:0px 0px 0px 0px;height:6%;width:15%;position:fixed; top:15%; left:80% ; min-height: calc(90% - 160px); height: calc(90% - 120px); overflow-y: auto;">
     <div class="left_menu_bg">
         <ul id="intervals">
         </ul>
@@ -115,13 +122,13 @@
 <script type="text/javascript">
     $(function () {
         $.ajaxSetup({cache: false});
-        $("#myManage").taiji({
-            enableAclCheck: true,
-            search: {
-                seachResultType: 'table',
-                autoSearch: false
-            }
-        })
+        // $("#myManage").taiji({
+        //     enableAclCheck: true,
+        //     search: {
+        //         seachResultType: 'table',
+        //         autoSearch: false
+        //     }
+        // })
     });
 </script>
 <!--引入数据-->
@@ -130,16 +137,16 @@
 
 </script>
 <script>
-    var btnShow= document.getElementById("btnShow");
-    var intervals= document.getElementById("intervals");
+    var btnShow = document.getElementById("btnShow");
+    var intervals = document.getElementById("intervals");
     intervals.style.display = 'none'
-    btnShow.onclick=function(){
-        if(btnShow.innerHTML==="收起"){
-            this.innerHTML="展开";
-            intervals.style.display="none";
-        }else{
-            this.innerHTML="收起";
-            intervals.style.display="block";
+    btnShow.onclick = function () {
+        if (btnShow.innerHTML === "收起") {
+            this.innerHTML = "展开";
+            intervals.style.display = "none";
+        } else {
+            this.innerHTML = "收起";
+            intervals.style.display = "block";
         }
         return false;
     }
@@ -151,8 +158,8 @@
 </script>
 <!--  初始化地图和路径 -->
 <script type="text/javascript">
-     var strData = JSON.parse(sessionStorage.getItem("JSON")).data
-     var jsonData = JSON.parse(strData);
+    var strData = JSON.parse(sessionStorage.getItem("JSON")).data
+    var jsonData = JSON.parse(strData);
     var map2 = jsonData;
 
     $(function () {
@@ -205,23 +212,198 @@
                 dataMap.set(roadName, entry);
             }
         }
+        var hash = {};
+        var i = 0;
+        var res = [];
+        unit.forEach(function (item) {
+            var name = item.roadName;
+            hash[name] ? res[hash[name] - 1].id.push(item.id) : hash[name] = ++i && res.push({
+                id: [item.id],
+                provune: item.id,
+                amendStatus: item.amendStatus,
+                roadName: item.roadName,
+            })
 
-        // 生成收费单元列表
-        dataMap.forEach(function (values, key) {
-            var a = "<li class='has-sub' ><a href='#' onClick='hasSubOnClick(this)'><div class='menu_wz' style ='text-align:center;padding-left:20px'>"
-                + key + "</div><div class='menu_jt'><i class='fa fa-caret-down fa-lg'></i></div></a>";
-            var ul = "<ul class='sub'>";
-
-            for (var i = 0; i < values.length; i++) {
-                ul += "<li ><a href='#' style='color: #E6A23C'>" + values[i] + "<div class='menu_jt'></div></a></li>"
-            }
-
-            ul += "</ul>";
-
-            a += ul;
-            a += "</li>"
-            $("#intervals").append(a);
         });
+        const container = document.getElementById('intervals');
+        const keyData = {
+            "37": "山东",
+            "35": "福建",
+            "13": "河北",
+            "41": "河南",
+            "50": "重庆",
+            "42": "湖北",
+            "43": "湖南",
+            "36": "江西",
+            "46": "海南",
+            "23": "黑龙江",
+            "12": "天津",
+            "52": "贵州",
+            "61": "陕西",
+            "65": "新疆",
+            "32": "江苏",
+            "34": "安徽",
+            "54": "西藏",
+            "22": "吉林",
+            "31": "上海",
+            "14": "山西",
+            "62": "甘肃",
+            "64": "宁夏",
+            "51": "四川",
+            "33": "浙江",
+            "45": "广西",
+            "53": "云南",
+            "15": "内蒙古",
+            "21": "辽宁",
+            "44": "广东",
+            "63": "青海",
+            "11": "北京"
+        }
+        res.forEach(item => {
+            for (var int in keyData) {
+                if (int == item.provune.slice(5, 7)) {
+                    item.name = keyData[int]
+                }
+            }
+        })
+        console.log(res,'res');
+        var moth = [],
+            flag = 0,
+            list = res;
+        var wdy = {
+            title: '',
+            name: ''
+        }
+        for (var i = 0; i < list.length; i++) {
+            var az = '';
+            for (var j = 0; j < moth.length; j++) {
+                if (moth[j].title == list[i]['name']) {
+                    flag = 1;
+                    az = j;
+                    break;
+                }
+            }
+            if (flag == 1) {
+                var ab = moth[az];
+                ab.name.push(list[i]);
+                flag = 0;
+
+            } else if (flag == 0) {
+                wdy = {};
+                wdy.title = list[i]['name'];
+                wdy.name = new Array();
+                wdy.name.push(list[i]);
+                moth.push(wdy);
+            }
+        }
+        const originUl = document.createElement('ul');
+        moth.forEach(item => {
+            var h3 = document.createElement('h3');
+            var ulA = document.createElement('ul');
+            var liA = document.createElement('li');
+            h3.style.color = '#333';
+            h3.className = 'A';
+            h3.innerText = item.title;
+            liA.appendChild(h3)
+            h3.addEventListener('click', function () {
+                console.log(1);
+                if (ulA.style.display == '') {
+                    ulA.style.display = 'none';
+                } else if (ulA.style.display == 'block') {
+                    ulA.style.display = 'none';
+                } else {
+                    ulA.style.display = 'block';
+                }
+            })
+            item.name.forEach(str => {
+                if (str.amendStatus) {
+                    var div = document.createElement('div');
+                    var ul = document.createElement('ul');
+                    var li = document.createElement('li');
+                    div.style.color = '#4095ee';
+                    div.className = 'B';
+                    div.style.paddingLeft = '10px'
+                    div.innerText = str.roadName;
+
+                    li.appendChild(div)
+                    ulA.appendChild(li)
+                    liA.appendChild(ulA)
+                    div.addEventListener('click', function () {
+                        console.log(1);
+                        if (ul.style.display == '') {
+                            ul.style.display = 'none';
+                        } else if (ul.style.display == 'block') {
+                            ul.style.display = 'none';
+                        } else {
+                            ul.style.display = 'block';
+                        }
+                    })
+                    str.id.forEach(val => {
+                        var lic = document.createElement('li');
+                        lic.innerText = val
+                        lic.style.color = '#4095ee';
+                        ul.className = "C"
+                        // ul.style.backgroundColor = '#8888';
+                        ul.style.paddingLeft = '20px'
+                        ul.appendChild(lic)
+                        li.appendChild(ul)
+                    })
+                    originUl.appendChild(liA)
+
+                } else {
+
+                    var div = document.createElement('div');
+                    var ul = document.createElement('ul');
+                    var li = document.createElement('li');
+                    div.style.color = '#238E68';
+                    div.className = 'B';
+                    div.style.paddingLeft = '10px'
+                    div.innerText = str.roadName;
+
+                    li.appendChild(div)
+                    ulA.appendChild(li)
+                    liA.appendChild(ulA)
+                    div.addEventListener('click', function () {
+                        console.log(1);
+                        if (ul.style.display == '') {
+                            ul.style.display = 'none';
+                        } else if (ul.style.display == 'block') {
+                            ul.style.display = 'none';
+                        } else {
+                            ul.style.display = 'block';
+                        }
+                    })
+                    str.id.forEach(val => {
+                        var lic = document.createElement('li');
+                        lic.innerText = val
+                        lic.style.color = '#238E68';
+                        ul.className = "C"
+                        // ul.style.backgroundColor = '#8888';
+                        ul.style.paddingLeft = '30px'
+                        ul.appendChild(lic)
+                        li.appendChild(ul)
+                    })
+                    originUl.appendChild(liA)
+                }
+            })
+        })
+        container.appendChild(originUl);
+        // 生成收费单元列表
+        // dataMap.forEach(function (values, key) {
+        //     var a = "<li class='has-sub' ><a href='#' onClick='hasSubOnClick(this)'><div class='menu_wz' style ='text-align:center;padding-left:20px'>"
+        //         + key + "</div><div class='menu_jt'><i class='fa fa-caret-down fa-lg'></i></div></a>";
+        //     var ul = "<ul class='sub'>";
+        //
+        //     for (var i = 0; i < values.length; i++) {
+        //         ul += "<li ><a href='#' style='color: #E6A23C'>" + values[i] + "<div class='menu_jt'></div></a></li>"
+        //     }
+        //
+        //     ul += "</ul>";
+        //
+        //     a += ul;
+        //     a += "</li>"
+        //     $("#intervals").append(a);
+        // });
     }
 
     function selectionOnclick(index) {

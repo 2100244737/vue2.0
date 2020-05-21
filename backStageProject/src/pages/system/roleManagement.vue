@@ -196,7 +196,6 @@ export default {
               })
 
           });
-          console.log(JSON.stringify(res))
       },
     resetCode() {
       // 添加取消按钮

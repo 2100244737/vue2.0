@@ -144,6 +144,7 @@
                         <!--                        <el-option label="超级管理员" value="admin"/>-->
                         <el-option label="设备厂商" value="c922573e79674edf846c3f9668d1a996"/>
                         <el-option label="车道管理员" value="d72499501fa540d8b90a274f2c41d9b7"/>
+                        <el-option label="地图管理员" value="458863e969df41cc97bb230938013326"/>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="手机号：">

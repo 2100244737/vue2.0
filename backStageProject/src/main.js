@@ -95,7 +95,6 @@ Vue.directive('antiShake', {
   },
   // 所在组件的 VNode 更新时调用
   update: function(el, binding) {
-    console.log('update')
     const { callback, time } = binding.value
     el.callback = callback
     el.time = time

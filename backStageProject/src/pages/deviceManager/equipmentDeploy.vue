@@ -459,7 +459,6 @@
                 var data = this.changeData(params, filename, _t.$cookie.get('accessToken'));
                 _t.$api.post('api/json', data, function (res) {
                     _t.stationIdList = JSON.parse(res.bizContent).data
-                    // console.log(_t.stationIdList, '123');
                 })
             },
             changeTollPlazaId(val) {
@@ -767,8 +766,7 @@
                             _t.$store.commit('set_loading', false);
                         }, 800);
                         _t.tableData = JSON.parse(res.bizContent).data ? JSON.parse(res.bizContent).data : [];
-                        var pages = JSON.parse(res.bizContent).totalCount
-                        // console.log(JSON.parse(res.bizContent), '123');
+                        var pages = JSON.parse(res.bizContent).totalCount;
                         _t.options.total = pages ? pages : 0;
                     } else {
                         _t.alertDialogTip(_t, res.errorMsg)

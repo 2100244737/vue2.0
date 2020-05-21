@@ -385,14 +385,12 @@
                 var filename = DEVICE_PAGE + getDataTime() + '.json';
                 var data = this.changeData(params, filename,_t.$cookie.get('accessToken'));
                 _t.$api.post('api/json', data, function (res) {
-                    // console.log(res);
                     if (res.statusCode == 0) {
                         setTimeout(() => {
                             _t.$store.commit('set_loading', false);
                         }, 800);
                         _t.tableData = JSON.parse(res.bizContent).data? JSON.parse(res.bizContent).data:[];
-                        var pages = JSON.parse(res.bizContent).totalCount
-                        // console.log(JSON.parse(res.bizContent), '123');
+                        var pages = JSON.parse(res.bizContent).totalCount;
                         _t.options.total = pages ? pages : 0;
                     }else {
                         _t.alertDialogTip(_t, res.errorMsg)
@@ -412,7 +410,6 @@
                 if (_t.addEdit.textarea) {
                     _t.addEdit.textarea.split(";").forEach(item => {
                         if (item.trim() !== "") {
-                            console.log();
                             text = item.split(',')[0]+','+item.split(',')[0].split('@')[1]+ ','+ item.split(',')[1]
                             ArrList.push(text)
                         }
@@ -422,7 +419,6 @@
                         openId: _t.$cookie.get('openId'),
                         list: ArrList // 数组
                     };
-                    console.log(params);
                     var filename = DEVICE_IMPORT + getDataTime() + '.json';
                     var data = this.changeData(params, filename,_t.$cookie.get('accessToken'));
                     _t.$api.post('api/json', data, function (res) {
