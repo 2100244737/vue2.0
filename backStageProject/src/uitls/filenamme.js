@@ -7,6 +7,8 @@
  const SSO_FIND = 'FCS_SSO_FIND_REQ_99999925_'; // 同步查询
  const SSO_ADD = 'FCS_USER_ADD_REQ_99999925_'; // 同步保存
  const USER_PAGE = 'FCS_USER_PAGE_REQ_99999925_'; // 同步保存
+ //  系统管理-查询日志
+ const SYSTEM_LOG = 'FCS_SYSTEM_LOG_REQ_99999925_'; // 查询日志
  // 设备备案
  const getEquipmentFile = 'FCS_DEVICE_FIND_REQ_99999925_' // 详情
 const addEquipmentDevice = 'FCS_DEVICE_ADD_REQ_99999925_' // 添加
@@ -25,6 +27,7 @@ const BIND_RELEASE ='FCS_BIND_RELEASE_REQ_99999925_n';      // 查询
 
 
  export {
+     SYSTEM_LOG,
      BIND_RELEASE,
      USER_LOGOUT,
      SSO_FIND,

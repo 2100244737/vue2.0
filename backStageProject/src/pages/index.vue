@@ -175,23 +175,24 @@
                     accessToken: _t.$cookie.get('accessToken'),
                     openId: _t.$cookie.get('openId'),
                 };
+                const outlogin = false
                 var filename = USER_LOGOUT + getDataTime() + '.json';
                 var data = this.changeData(params, filename, _t.$cookie.get('accessToken'));
                 _t.$api.post('api/json', data, function (res) {
                     if (res.statusCode == 0) {
-                          _t.$router.push('/login')
-                         _t.$cookie.delete('openId');
+                          // _t.$router.push('/login')
+                          // _t.$cookie.delete('openId');
+                          // _t.$store.state.options = [];
+                          // _t.$store.state.activeIndex = '';
                     } else {
                         _t.alertDialogTip(_t, res.errorMsg)
                     }
                 })
-
-
-                // 退出
-
-
-                this.$store.state.options = [];
-                this.$store.state.activeIndex = '';
+                //退出
+                    _t.$router.push('/login')
+                    _t.$cookie.delete('openId');
+                    _t.$store.state.options = [];
+                    _t.$store.state.activeIndex = '';
 
             },
         },

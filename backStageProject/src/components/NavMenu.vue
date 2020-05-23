@@ -31,6 +31,12 @@
                             <span>用户管理</span>
                         </template>
                     </el-menu-item>
+                    <el-menu-item v-if="logQuery" index="/system/logQuery">
+                        <template slot="title">
+                            <i class="el-icon-menu"></i>
+                            <span>查询日志</span>
+                        </template>
+                    </el-menu-item>
                 </el-menu-item-group>
             </el-submenu>
             <el-submenu v-if="device" index="/deviceManager">
@@ -77,6 +83,7 @@
         data() {
             return {
                 nvaBarList: [],
+                logQuery: false, // 查询日志
                 system: false, // 系统管理
                 role: false, // 角色管理
                 user: false, // 角色管理
@@ -146,6 +153,10 @@
                     if (item.url == 'system/user') {
                         // 用户管理
                         this.user = true;
+                    }
+                    if (item.url == 'system/log/') {
+                        // 查询日志
+                        this.logQuery = true;
                     }
                     if (item.url == 'device/manage') {
                         // 设备备案

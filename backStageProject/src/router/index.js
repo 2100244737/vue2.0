@@ -15,6 +15,8 @@ import pathQuery from '../pages/queryPath/pathQuery'
 import roleManagement from "@/pages/system/roleManagement"
 // 系统管理- 用户管理
 import userManagement from "@/pages/system/userManagement"
+// 系统管理 - 查询日志
+import logQuery from "../pages/system/logQuery";
 
 // 设备管理
 // 设备备案
@@ -24,6 +26,11 @@ import equipmentDeploy from "../pages/deviceManager/equipmentDeploy";
 // 测试
 import dome from '../pages/dome'
 Vue.use(Router);
+
+const originalPush = Router.prototype.push
+Router.prototype.push = function push(location) {
+    return originalPush.call(this, location).catch(err => err)
+}
 const routers = new Router({
   routes: [
 
@@ -45,6 +52,7 @@ const routers = new Router({
       children: [
         {path: 'roleManagement', name: 'roleManagement', meta: {title: '角色管理'}, component: roleManagement,},
         {path: 'userManagement', name: 'userManagement', meta: {title: '用户管理'}, component: userManagement,},
+        {path: 'logQuery', name: 'logQuery', meta: {title: '查询日志'}, component: logQuery,},
       ]
     },
     {

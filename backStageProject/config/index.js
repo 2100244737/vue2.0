@@ -12,8 +12,8 @@ module.exports = {
     assetsPublicPath: '/', //  修改打包路径
     proxyTable: {
       '/api': {
-          // target: 'https://testgw.cywetc.com',
-          target: 'http://10.1.0.223',
+           //target: 'https://testgw.cywetc.com',
+         target: 'http://10.1.0.223',
         // target: 'https//device.cywetc.com/fcs',
         changeOrigin: true,
         pathRewrite: {
