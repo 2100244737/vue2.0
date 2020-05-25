@@ -27,19 +27,15 @@ import equipmentDeploy from "../pages/deviceManager/equipmentDeploy";
 import dome from '../pages/dome'
 Vue.use(Router);
 
-const originalPush = Router.prototype.push
-Router.prototype.push = function push(location) {
-    return originalPush.call(this, location).catch(err => err)
-}
 const routers = new Router({
   routes: [
 
     {path: '/', redirect: '/login', hidden: true},
       {path: '/login', name: 'login', component: login, hidden: true},
-    //   {path: '/', redirect: '/demo', hidden: true},
-    //   {path: '/demo', name: 'demo', component: dome, hidden: true},
+       // {path: '/', redirect: '/demo', hidden: true},
+       {path: '/demo', name: 'demo', component: dome, hidden: true},
     {
-      path: '/index', name: 'index', meta: {title: '首页'}, component: index,
+      path: '/index', name: '', meta: {title: '首页'}, component: index,
       children: [
         {path: '/index', name: 'index', meta: {
           title: '首页',

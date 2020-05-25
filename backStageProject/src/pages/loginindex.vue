@@ -1,55 +1,62 @@
 <template>
-    <div  class="login-container">
-        <div class="box">
-            <div ref="add" class="IMgheader">
-                <img class="img" src="../assets/img/logo.png" alt="">
+    <div class="login-container">
+        <div class="box card ">
+            <div class="card-borders">
+                <div class="border-top"></div>
+                <div class="border-right"></div>
+                <div class="border-bottom"></div>
+                <div class="border-left"></div>
             </div>
-            <el-form  ref="loginForm" :rules="rules" :model="loginForm" class="login-form width" autocomplete="on"
-                     label-position="left">
-                <div class="title-container">
-                    <h3 class="title">用户登录</h3>
+                <div class="IMgheader">
+                    <img class="img" src="../assets/img/logo.png" alt="">
                 </div>
-                <el-form-item prop="username">
-                    <el-input
-                        id="username"
-                        ref="username"
-                        autofocus
-                        clearable
-                        prefix-icon="el-icon-user-solid"
-                        v-model="loginForm.username"
-                        placeholder="请输入手机号"
-                        maxlength="11"
-                        name="username"
-                        type="text"
-                        tabindex="1"
-                        autocomplete="on"
-                    />
-                </el-form-item>
-                <el-form-item prop="password">
-                    <div class="inputBtn">
+                <el-form ref="loginForm" :rules="rules" :model="loginForm" class="login-form width" autocomplete="on"
+                         label-position="left">
+                    <div class="title-container">
+                        <h3 class="title">用户登录</h3>
+                    </div>
+                    <el-form-item prop="username">
                         <el-input
-                            @keyup.enter.native="handleLogin"
-                            ref="password"
-                            prefix-icon="el-icon-lock"
-                            maxlength="6"
-                            @input="changeinput(loginForm.password)"
-                            v-model="loginForm.password" type="text"
-                            placeholder="请输入验证码"
-                            name="password"
-                            tabindex="2"
+                            id="username"
+                            ref="username"
+                            clearable
+                            prefix-icon="el-icon-user-solid"
+                            v-model="loginForm.username"
+                            placeholder="请输入手机号"
+                            maxlength="11"
+                            name="username"
+                            type="text"
+                            tabindex="1"
                             autocomplete="on"
                         />
-                        <el-button class="btn" v-if="btnShow" type="primary" @click.native.prevent="handleCode">获取验证码
+                    </el-form-item>
+                    <el-form-item prop="password">
+                        <div class="inputBtn">
+                            <el-input
+                                @keyup.enter.native="handleLogin"
+                                ref="password"
+                                prefix-icon="el-icon-lock"
+                                maxlength="6"
+                                @input="changeinput(loginForm.password)"
+                                v-model="loginForm.password" type="text"
+                                placeholder="请输入验证码"
+                                name="password"
+                                tabindex="2"
+                                autocomplete="on"
+                            />
+                            <el-button class="btn" v-if="btnShow" type="primary" @click.native.prevent="handleCode">获取验证码
+                            </el-button>
+                            <el-button class="btn btnLogin btnBubbles   btnPink" v-else type="primary">{{counts}} s后重试</el-button>
+                        </div>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-button  type="primary" style="width:100%;margin-bottom:30px;"
+                                   @click.native.prevent="handleLogin">登录
                         </el-button>
-                        <el-button class="btn" v-else type="primary">{{counts}} s后重试</el-button>
-                    </div>
-                </el-form-item>
-                <el-form-item>
-                    <el-button type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录
-                    </el-button>
-                </el-form-item>
+                    </el-form-item>
 
-            </el-form>
+                </el-form>
+
         </div>
 
     </div>
@@ -122,7 +129,7 @@
                 // var src = JSON.stringify(params)
                 const token = 'chinaetcorg'
                 var filename = loginfile + getDataTime() + '.json';
-                var data = _t.changeData(params, filename,token);
+                var data = _t.changeData(params, filename, token);
                 _t.$api.post('api/json', data, function (res) {
                     if (res.statusCode == 0) {
                         var menuList = JSON.parse(res.bizContent).menus
@@ -134,11 +141,11 @@
                         });
                         _t.loginForm.openId = JSON.parse(res.bizContent).openId;
                         _t.loginForm.accessToken = JSON.parse(res.bizContent).accessToken;
-                       const mobile = JSON.parse(res.bizContent).mobile;
-                       const name = JSON.parse(res.bizContent).name;
-                       const roleName = JSON.parse(res.bizContent).roleName?JSON.parse(res.bizContent).roleName: '';
+                        const mobile = JSON.parse(res.bizContent).mobile;
+                        const name = JSON.parse(res.bizContent).name;
+                        const roleName = JSON.parse(res.bizContent).roleName ? JSON.parse(res.bizContent).roleName : '';
 
-                         _t.$router.push("/index");
+                        _t.$router.push("/index");
                         _t.$cookie.set('openId', _t.loginForm.openId);
                         _t.$cookie.set('accessToken', _t.loginForm.accessToken);
                         _t.$cookie.set('username', name); // 用户名
@@ -148,7 +155,7 @@
                         _t.alertDialogTip(_t, res.errorMsg)
                     }
                 })
-
+                _t.$router.push("/index");
             },
             handleCode() {
                 var _t = this;
@@ -159,7 +166,7 @@
                     };
                     const token = 'chinaetcorg'
                     var filename = getCodefile + getDataTime() + '.json';
-                    var data = this.changeData(params, filename,token);
+                    var data = this.changeData(params, filename, token);
                     _t.$api.post('api/json', data, function (res) {
                         if (res.statusCode == 0) {
                             _t.getCode();
@@ -215,7 +222,7 @@
                 })
                 return endArr
             },
-            aa (x) {
+            aa(x) {
 
             },
             dome() {
@@ -238,13 +245,15 @@
             this.$cookie.delete('accessToken');
             this.$cookie.delete('phone');
             this.$cookie.delete('username');
-           this.$cookie.delete('roleName');
+            this.$cookie.delete('roleName');
             localStorage.removeItem("MENU_LIST");
         }
     }
 </script>
 
 <style scoped>
+    @import "login.css";
+
     .title-container {
         color: #333;
         font-size: 20px;
@@ -268,6 +277,7 @@
         /*box-sizing: border-box;*/
         width: 100%;
         height: 100%;
+        min-width: 1440px;
         background: url(".././assets/img/login.jpg") no-repeat;
         background-position: right bottom;
         background-size: 45% 100%;
@@ -275,14 +285,21 @@
         box-sizing: border-box;
 
     }
+
     .login-container .box {
-        position: fixed;
-        top: 20%;
-        left: 9%;
-    }
-    .IMgheader {
+        position: relative;
+        top: 10%;
+        left: 5%;
         width: 400px;
-        max-width: 400px;
+        min-width: 400px;
+        height: 382px;
+        text-align: center;
+    }
+
+    .IMgheader {
+        /*width: 400px;*/
+        /*max-width: 400px;*/
+        position: relative;
     }
 
     .IMgheader .img {

@@ -1,58 +1,93 @@
 <template>
     <div class="view">
-        <el-table
-            :data="tableData"
-            style="width: 100%">
-            <el-table-column
-                prop="date"
-                label="日期"
-                width="180">
-            </el-table-column>
-            <el-table-column
-                prop="name"
-                label="姓名"
-                width="180">
-            </el-table-column>
-            <el-table-column
-                prop="address"
-                label="地址">
-            </el-table-column>
-        </el-table>
+        <div class="content">
+            <nav class="nav">
+                <div class="headerimg">
+                    <img class="img" src="../assets/img/icon.png" alt="">
+                </div>
+                <NavMenu class="NavMenu"/>
+            </nav>
+            <div class="right">
+                <header class="header">
+
+                    <h3 class="headertitle">
+
+                        <!--              互联网收费业务处理终端-->
+                        <span v-bind:class="{active:isActive&&index==current}" v-for="(item, index) in text "
+                              :key="index" @mouseenter="enter(index)" @mouseleave="leave(index)">{{item}}</span>
+                    </h3>
+                    <div class="headerview">
+                        <el-button class="loginOut" type="primary" @click="loginOut">退出</el-button>
+                        <el-dropdown>
+                            <img class="loginlogo" src="../assets/img/icon.png" alt="">
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item>用户名：{{username}}</el-dropdown-item>
+                                <el-dropdown-item>手机号：{{phone}}</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                    </div>
+
+                </header>
+                <div>
+                    <el-tabs
+                        class="template-tabs"
+                        v-model="activeIndex"
+                        type="border-card"
+                        closable
+                        @tab-click="tabClick"
+                        @tab-remove="tabRemove">
+                        <el-tab-pane
+                            :key="item.name"
+                            v-for="(item, index) in options"
+                            :label="item.title"
+                            :name="item.name">
+                        </el-tab-pane>
+                    </el-tabs>
+                </div>
+                <div   v-loading="loading"
+                       element-loading-text="拼命加载中..."
+                       element-loading-spinner="el-icon-loading"
+                       element-loading-background="#fff" class="main">
+                    <div
+                        class="main">
+                        <router-view/>
+                    </div>
+                </div>
+
+
+                <!--        <footer class="footer">底部</footer>-->
+            </div>
+
+        </div>
     </div>
 </template>
 
 <script>
     //  侧边栏组件
     import NavMenu from "../components/NavMenu";
-    import {getDataTime} from "../assets/js/time";
+    import {getDataTime} from '@/assets/js/time' // 获取当前时间
+    import {USER_LOGOUT} from '@/uitls/filenamme';
 
     export default {
         name: 'index',
         data() {
             return {
-                tableData: [{
-                    date: '2016-05-02',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1518 弄'
-                }, {
-                    date: '2016-05-04',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1517 弄'
-                }, {
-                    date: '2016-05-01',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1519 弄'
-                }, {
-                    date: '2016-05-03',
-                    name: '王小虎',
-                    address: '上海市普陀区金沙江路 1516 弄'
-                }]
+                username: this.$cookie.get('username'), // 用户名称
+                phone: this.$cookie.get('phone'), // 手机号
+                cached: [], // 缓存的组件
+                routePath: '',
+                isActive: false,
+                current: 0,
+                text: '联网收费业务处理终端运营管理系统'
             }
         },
         components: {
             NavMenu
         },
         computed: {
+            loading () {
+                return this.$store.state.loading
+            },
             options() {
                 this.cached = [];
                 this.$store.state.options.forEach(item => {
@@ -134,11 +169,30 @@
                 }
             },
             loginOut() {
-                // 退出
-                // this.$cookie.delete('openId');
-                this.$router.push('/login')
-                this.$store.state.options = [];
-                this.$store.state.activeIndex = '';
+                var _t = this;
+                // 提交
+                const params = {
+                    accessToken: _t.$cookie.get('accessToken'),
+                    openId: _t.$cookie.get('openId'),
+                };
+                const outlogin = false
+                var filename = USER_LOGOUT + getDataTime() + '.json';
+                var data = this.changeData(params, filename, _t.$cookie.get('accessToken'));
+                _t.$api.post('api/json', data, function (res) {
+                    if (res.statusCode == 0) {
+                        // _t.$router.push('/login')
+                        // _t.$cookie.delete('openId');
+                        // _t.$store.state.options = [];
+                        // _t.$store.state.activeIndex = '';
+                    } else {
+                        _t.alertDialogTip(_t, res.errorMsg)
+                    }
+                })
+                //退出
+                _t.$router.push('/login')
+                _t.$cookie.delete('openId');
+                _t.$store.state.options = [];
+                _t.$store.state.activeIndex = '';
 
             },
         },
@@ -151,15 +205,17 @@
 </script>
 
 <style scoped>
-   .left h3  {
+    /deep/ .el-scrollbar .el-scrollbar__wrap {
+        overflow-x: hidden;
+    }
+
+    h3 span {
         display: inline-block;
         transition: width 1s;
-        font-size:30px;
+
         -webkit-transition: width 1s; /* Safari */
     }
-     h3 {
 
-     }
     .active {
 
         position: relative;
@@ -168,7 +224,7 @@
         color: #1A98FF;
     }
 
-    .el-tabs /deep/ .el-tabs__item:first-child /deep/ .el-icon-close:before {
+    /deep/ .el-tabs  .el-tabs__item:first-child .el-icon-close:before {
         content: ''
     }
 
@@ -185,11 +241,23 @@
         /*标签页选中背景颜色*/
         background: #42b983;
         color: #ffffff;
+        border-radius: 5px;
     }
 
     .headerimg {
-        margin-left: 5%;
-        margin-right: 20px;
+        /*color: #333;*/
+        /*font-size: 18px;*/
+        height: 80px;
+        display: flex;
+        flex-direction: row-reverse;
+        align-items: center;
+        /*line-height: 80px;*/
+        /*font-weight: 700;*/
+        text-align: center;
+        /*border-bottom: 1px solid #999;*/
+        /*border-right: 1px solid #ddd;*/
+        /*background-color: #f0f0f0;*/
+        /*box-shadow: 0 0 10px 5px #ccc inset*/
     }
 
     .headerimg .img {
@@ -200,40 +268,40 @@
     .view {
         height: 100%;
         width: 100%;
+        /*min-width: 1440px;*/
+        /*overflow: auto;*/
+        /*background: #F0F2F5;*/
     }
-    .buttonBHox {
-        display: flex;
-        height: 100%;
-        width: 100%;
-    }
-   .aside {
-       height: 100%;
-       background: red;
-   }
+
     .main {
         /*width: 100%;*/
         /*height: 100%;*/
         /*padding: 20px;*/
         /*margin: 0;*/
         /*box-sizing: border-box;*/
-        /*position: fixed;*/
-        /*top: 70px;*/
-        /*left: 181px;*/
-        /*right: 30px;*/
-        /*bottom: 30px;*/
-        /*z-index: 10;*/
-        height: 100%;
-        width: 100%;
-        overflow: auto;
+        position: fixed;
+        top: 138px;
+        left: 215px;
+        right: 30px;
+        bottom: 30px;
+        z-index: 10;
+        overflow-y: auto;
     }
 
     .content {
+        display: flex;
         height: 100%;
         width: 100%;
         color: #333;
     }
 
-    .navTitle {
+    .nav {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .nav .navTitle {
         height: 60px;
         width: 100px;
         line-height: 60px;
@@ -242,40 +310,25 @@
         font-size: 15px;
         font-weight: 700;
         background: #ffffff;
-        border-right: 0.4px solid #ccc;
+        /*border-right: 0.4px solid #ccc;*/
     }
 
-    .NavMenu {
+    .nav .NavMenu {
         flex: 1;
         width: 200px;
+        /*max-width: 200px;*/
+    }
+
+    .right {
+        width: 99%;
         height: 100%;
+        overflow: hidden;
     }
 
     .header {
-        display: flex;
-        justify-content: space-between;
-        border-bottom: 0.4px solid #cccccc;
-    }
-    .header .left {
-        display: flex;
-        height: 100%;
-        width: 100%;
-        align-items: center;
-     }
-    .header .headerview {
-        margin-right: 8%;
-        height: 100%;
-        display: flex;
-        align-items: center;
-    }
-     .headertitle {
-
-     }
-    .header .loginlogo {
-        width: 70px;
-        height: 70px;
-        margin-right: 10px;
-        border-radius: 50PX;
+        margin-right: 5%;
+        padding: 8.5px;
+        /*border-bottom: 0.4px solid #cccccc;*/
     }
 
     .template-tabs {
@@ -283,5 +336,40 @@
         margin-left: -1px;
     }
 
+    .header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
 
+    .headertitle {
+
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 30px;
+        margin-left: 5px;
+        margin-bottom: 0;
+    }
+
+    .header .headerview {
+        display: flex;
+        align-items: center;
+        padding-right: 20px;
+        padding-top: 10px;
+        flex-direction: row-reverse;
+    }
+
+    .header .headerview .loginlogo {
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        margin-right: 15px;
+    }
+
+    .footer {
+        height: 30px;
+        width: 100%;
+        background: blue;
+    }
 </style>

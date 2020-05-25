@@ -91,12 +91,13 @@
                 <el-form-item label="设备编号：" prop="deviceId">
                     <el-input  clearable maxlength="50" v-model="addEdit.deviceId" placeholder="设备编号"></el-input>
                 </el-form-item>
+                <el-form-item label="设备型号：">
+                    <el-input maxlength="150" v-model="addEdit.model" placeholder="设备型号"></el-input>
+                </el-form-item>
 <!--                <el-form-item label="SE芯片编号：" prop="seNo">-->
 <!--                    <el-input  clearable maxlength="150" v-model="addEdit.seNo" placeholder="芯片编号"></el-input>-->
 <!--                </el-form-item>-->
-                <!--                <el-form-item label="设备型号：">-->
-                <!--                    <el-input maxlength="150" v-model="addEdit.model" placeholder="设备型号"></el-input>-->
-                <!--                </el-form-item>-->
+
                 <!--        <el-form-item label="硬件版本号：">-->
                 <!--          <el-input v-model="addEdit.softwareVersion" placeholder="硬件版本号"></el-input>-->
                 <!--        </el-form-item>-->

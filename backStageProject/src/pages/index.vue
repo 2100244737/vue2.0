@@ -44,15 +44,15 @@
                         </el-tab-pane>
                     </el-tabs>
                 </div>
-                 <div   v-loading="loading"
-                        element-loading-text="拼命加载中..."
-                        element-loading-spinner="el-icon-loading"
-                        element-loading-background="#fff" class="main">
-                     <div
-                         class="main">
-                         <router-view/>
-                     </div>
-                 </div>
+                <div   v-loading="loading"
+                       element-loading-text="拼命加载中..."
+                       element-loading-spinner="el-icon-loading"
+                       element-loading-background="#fff" class="main">
+                    <div
+                        class="main">
+                        <router-view/>
+                    </div>
+                </div>
 
 
                 <!--        <footer class="footer">底部</footer>-->
@@ -180,19 +180,19 @@
                 var data = this.changeData(params, filename, _t.$cookie.get('accessToken'));
                 _t.$api.post('api/json', data, function (res) {
                     if (res.statusCode == 0) {
-                          // _t.$router.push('/login')
-                          // _t.$cookie.delete('openId');
-                          // _t.$store.state.options = [];
-                          // _t.$store.state.activeIndex = '';
+                        // _t.$router.push('/login')
+                        // _t.$cookie.delete('openId');
+                        // _t.$store.state.options = [];
+                        // _t.$store.state.activeIndex = '';
                     } else {
                         _t.alertDialogTip(_t, res.errorMsg)
                     }
                 })
                 //退出
-                    _t.$router.push('/login')
-                    _t.$cookie.delete('openId');
-                    _t.$store.state.options = [];
-                    _t.$store.state.activeIndex = '';
+                _t.$router.push('/login')
+                _t.$cookie.delete('openId');
+                _t.$store.state.options = [];
+                _t.$store.state.activeIndex = '';
 
             },
         },
@@ -224,7 +224,7 @@
         color: #1A98FF;
     }
 
-    .el-tabs /deep/ .el-tabs__item:first-child /deep/ .el-icon-close:before {
+    /deep/ .el-tabs  .el-tabs__item:first-child .el-icon-close:before {
         content: ''
     }
 
@@ -268,6 +268,7 @@
     .view {
         height: 100%;
         width: 100%;
+        /*min-width: 1440px;*/
         /*overflow: auto;*/
         /*background: #F0F2F5;*/
     }
@@ -284,7 +285,7 @@
         right: 30px;
         bottom: 30px;
         z-index: 10;
-        overflow: auto;
+        overflow-y: auto;
     }
 
     .content {

@@ -35,6 +35,11 @@ import JSONView from 'vue-json-viewer'
 Vue.prototype.$api = axios;
 Vue.prototype.$md5 = md5;
 Vue.config.productionTip = false;
+import Router from 'vue-router'
+const routerPush = Router.prototype.push
+Router.prototype.push = function push(location) {
+    return routerPush.call(this, location).catch(error=> error)
+}
 
 Vue.prototype.changeData = function (content,filename,token){
   var params = {
