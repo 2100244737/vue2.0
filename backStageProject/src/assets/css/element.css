@@ -15,7 +15,18 @@
 }
 /*表格数据背景色*/
 .el-table th {
-  background-color: #ddd;
+  background-color: #324157 !important;
+}
+.el-drawer :focus{
+
+    outline:0;
+
 }
 
+ .el-button--text {
+    display: none;
+}
 
+.el-color-picker__panel {
+    z-index: 9999999999!important;
+}

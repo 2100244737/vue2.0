@@ -7,6 +7,9 @@ import router from './router'
 import ElementUI from 'element-ui';
 //  引入 element css
 import 'element-ui/lib/theme-chalk/index.css';
+// 多语言切换
+import i18n from './i18n/i18n';
+
 // 引入初始化样式
 import 'normalize.css/normalize.css'
 // 引入element自定义样式
@@ -60,7 +63,9 @@ Vue.use(JSONView)
 //  复制挂载全局
 Vue.use(VueClipboard)
 // 挂载全局
-Vue.use(ElementUI);
+Vue.use(ElementUI,{
+    i18n: (key, value) => i18n.t(key, value)
+});
 //  cookie 挂载到全局
 Vue.use(vueCookie);
 Vue.use(debounce)
@@ -128,18 +133,18 @@ export default new Vue({
   el: '#app',
   router,
   store,
+    i18n,
   components: { App },
   template: '<App/>',
   watch: {
-    "$route": 'checkLogin'
   },
   methods: {
     // 检查是否登录
-    checkLogin(to,from) {
-        if (!this.$cookie.get('accessToken') || !this.$cookie.get('openId') ) {
-        this.$router.replace('/login');
-      }
-    },
+    // checkLogin(to,from) {
+    //     if (!this.$cookie.get('accessToken') || !this.$cookie.get('openId') ) {
+    //     this.$router.replace('/login');
+    //   }
+    // },
   }
 })
 

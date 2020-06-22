@@ -426,8 +426,12 @@
             },
         },
         created() {
-            this.$store.commit('set_loading', true);
-            this.refreshHandle()
+            var _t = this
+            _t.$store.commit('set_loading', true);
+            // this.refreshHandle()
+            setTimeout(() => {
+                _t.$store.commit('set_loading', false);
+            }, 800);
         }
     }
 </script>

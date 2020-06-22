@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/back-stage.iml" filepath="$PROJECT_DIR$/.idea/back-stage.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/ETCproject.iml" filepath="$PROJECT_DIR$/.idea/ETCproject.iml" />
     </modules>
   </component>
 </project>

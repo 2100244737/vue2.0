@@ -2,34 +2,36 @@
     <div class="view">
         <div class="content">
             <nav class="nav">
-                <div class="headerimg">
-                    <img class="img" src="../assets/img/icon.png" alt="">
-                </div>
                 <NavMenu class="NavMenu"/>
             </nav>
             <div class="right">
                 <header class="header">
-
-                    <h3 class="headertitle">
-
-                        <!--              互联网收费业务处理终端-->
-                        <span v-bind:class="{active:isActive&&index==current}" v-for="(item, index) in text "
-                              :key="index" @mouseenter="enter(index)" @mouseleave="leave(index)">{{item}}</span>
-                    </h3>
-                    <div class="headerview">
-                        <el-button class="loginOut" type="primary" @click="loginOut">退出</el-button>
-                        <el-dropdown>
-                            <img class="loginlogo" src="../assets/img/icon.png" alt="">
+                    <div class="headertitle">
+                        <Breadcrumb v-if="showBreadcrumbl"></Breadcrumb>
+                    </div>
+                    <div class="headerview loginlogo">
+                        <el-dropdown @command="handleCommand">
+                            <div>
+                                <img class="loginlogo" src="../assets/img/Avatar.png" alt="">
+                                <i class="el-icon-arrow-down el-icon--right"></i>
+                            </div>
                             <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item>用户名：{{username}}</el-dropdown-item>
-                                <el-dropdown-item>手机号：{{phone}}</el-dropdown-item>
+                                <el-dropdown-item command="out">退出</el-dropdown-item>
                             </el-dropdown-menu>
                         </el-dropdown>
-                    </div>
+                          <div class="picker">
+                              <el-tooltip :content="allText? '全屏模式':'普通模式'">
+                                  <img  v-if="showfull" :src="fullImg?fullAll1:fullAll2" class="fullAll" @click="buttoncli"
+                                       alt="全屏">
+                              </el-tooltip>
+                              <lang></lang>
+                          </div>
 
+                    </div>
                 </header>
                 <div>
                     <el-tabs
+
                         class="template-tabs"
                         v-model="activeIndex"
                         type="border-card"
@@ -50,21 +52,70 @@
                        element-loading-background="#fff" class="main">
                     <div
                         class="main">
-                        <router-view/>
+                        <keep-alive v-if="isRouterAlive" :include="cached">
+                            <router-view></router-view>
+                        </keep-alive>
                     </div>
                 </div>
-
-
                 <!--        <footer class="footer">底部</footer>-->
             </div>
-
         </div>
+         <div class="set">
+             <div @click="setData" class="setImg">
+                 <i v-if="drawer" class="el-icon-close  setIcon"></i>
+                 <i v-else class=" el-icon-setting setIcon"></i>
+             </div>
+             <el-drawer
+                 title="我是标题"
+                 size="307px"
+                 :visible.sync="drawer"
+                 :with-header="false">
+                 <div class="drawerContent">
+                      <h2>系统布局配置</h2>
+                       <div class="setPicker">
+                           <span>主题色</span>
+                           <ThemePicker></ThemePicker>
+                       </div>
+                       <div class="setfull">
+                           <span>是否显示全屏功能</span>
+                           <el-switch
+                               v-model="showfull"
+                               active-color="#13ce66"
+                               inactive-color="#ddd">
+                           </el-switch>
+                       </div>
+                     <div class="setfull">
+                           <span>是否显示Breadcrumb功能</span>
+                           <el-switch
+                               v-model="showBreadcrumbl"
+                               active-color="#13ce66"
+                               inactive-color="#ddd">
+                           </el-switch>
+                       </div>
+                     <div class="copyright">
+                         <div class="logo">
+                             Copyright
+                             <span>©北京数软科技有限公司 版权所有</span>
+                         </div>
+                         <p>经营理念：诚信·务实·高效·至上·高端</p>
+                         <p class="text">我们只是喜欢互联网的一群人,为互联网创建内容</p>
+                         <p>地址：<span>北京市海淀区黑泉路12号康健宝盛广场B座8层</span></p>
+                         <p>邮箱：<span>datasw@datasw.cn</span></p>
+                         <p>版本 <span>1.0.0.1</span></p>
+                     </div>
+                 </div>
+             </el-drawer>
+         </div>
     </div>
 </template>
 
 <script>
     //  侧边栏组件
     import NavMenu from "../components/NavMenu";
+    import ThemePicker from "../components/ThemePicker";
+    import screenfull from "screenfull";
+    import Breadcrumb from '../components/Breadcrumb'
+    import lang from "../components/lang";
     import {getDataTime} from '@/assets/js/time' // 获取当前时间
     import {USER_LOGOUT} from '@/uitls/filenamme';
 
@@ -72,6 +123,14 @@
         name: 'index',
         data() {
             return {
+                isRouterAlive: true,
+                showBreadcrumbl: true, // 面包屑导航
+                showfull: false, // 显示全屏
+                allText: true,
+                fullImg: true,// 全屏 背景图
+                fullAll1: require('.././assets/img/all1.png'),
+                fullAll2: require('.././assets/img/all.png'),
+                drawer: false, // 设置
                 username: this.$cookie.get('username'), // 用户名称
                 phone: this.$cookie.get('phone'), // 手机号
                 cached: [], // 缓存的组件
@@ -82,7 +141,10 @@
             }
         },
         components: {
-            NavMenu
+            NavMenu,
+            ThemePicker,
+            Breadcrumb,
+            lang
         },
         computed: {
             loading () {
@@ -126,6 +188,33 @@
             },
         },
         methods: {
+            setData () {
+                // 设置
+                this.drawer =  !this.drawer;
+            },
+            buttoncli() {
+                // 需要注意的是 如果判断!screenfull.enabled 显示的是不支持全屏的话 是因为谷歌的版本问题  判断改为 !screenfull.isEnabled  就可以了
+                if (!screenfull.isEnabled) {
+                    this.$message({
+                        message: '该浏览器版本不支持全屏！',
+                        type: 'warning'
+                    })
+                    return false
+                } else {
+                    this.fullImg = !this.fullImg
+                    this.allText = !this.allText
+                    screenfull.toggle()
+                }
+            },
+            handleCommand (command) {
+                if (command == 'out') {
+                    this.loginOut()
+                }
+
+            },
+            handleClose () {
+                this.drawer = false;
+            },
             enter(index) {
                 this.isActive = true;
                 this.current = index
@@ -153,7 +242,7 @@
                         this.cached.splice(index, 1)
                     }
                 });
-                // _t.cached.push(path);
+                 _t.cached.push(path);
                 // 删除当前页签
                 _t.$store.commit('delete_tabs', path);
                 _t.routePath = path;
@@ -170,24 +259,6 @@
             },
             loginOut() {
                 var _t = this;
-                // 提交
-                const params = {
-                    accessToken: _t.$cookie.get('accessToken'),
-                    openId: _t.$cookie.get('openId'),
-                };
-                const outlogin = false
-                var filename = USER_LOGOUT + getDataTime() + '.json';
-                var data = this.changeData(params, filename, _t.$cookie.get('accessToken'));
-                _t.$api.post('api/json', data, function (res) {
-                    if (res.statusCode == 0) {
-                        // _t.$router.push('/login')
-                        // _t.$cookie.delete('openId');
-                        // _t.$store.state.options = [];
-                        // _t.$store.state.activeIndex = '';
-                    } else {
-                        _t.alertDialogTip(_t, res.errorMsg)
-                    }
-                })
                 //退出
                 _t.$router.push('/login')
                 _t.$cookie.delete('openId');
@@ -208,7 +279,24 @@
     /deep/ .el-scrollbar .el-scrollbar__wrap {
         overflow-x: hidden;
     }
+    .picker {
+        width: 50px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-right: 20px;
+    }
+    /deep/ :focus{
 
+        outline:0;
+
+    }
+    .fullAll{
+        width: 30px;
+        cursor: pointer;
+        height: 30px;
+        margin-right: 25px;
+    }
     h3 span {
         display: inline-block;
         transition: width 1s;
@@ -217,7 +305,6 @@
     }
 
     .active {
-
         position: relative;
         top: -5px;
         font-size: 40px;
@@ -247,7 +334,7 @@
     .headerimg {
         /*color: #333;*/
         /*font-size: 18px;*/
-        height: 80px;
+        height: 77px;
         display: flex;
         flex-direction: row-reverse;
         align-items: center;
@@ -268,9 +355,7 @@
     .view {
         height: 100%;
         width: 100%;
-        /*min-width: 1440px;*/
-        /*overflow: auto;*/
-        /*background: #F0F2F5;*/
+
     }
 
     .main {
@@ -298,6 +383,7 @@
     .nav {
         height: 100%;
         display: flex;
+
         flex-direction: column;
     }
 
@@ -351,7 +437,11 @@
         margin-left: 5px;
         margin-bottom: 0;
     }
-
+   .setIcon {
+       display: inline-block;
+       font-size: 30px;
+       color: #eef1f6;
+   }
     .header .headerview {
         display: flex;
         align-items: center;
@@ -359,17 +449,54 @@
         padding-top: 10px;
         flex-direction: row-reverse;
     }
-
+     .setImg {
+        position: fixed;
+         right: 0;
+         top: 45%;
+         width: 50px;
+         height: 50px;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         background: var(--bck);
+         z-index: 33008;
+         border-bottom-left-radius: 20px;
+         border-top-left-radius: 20px;
+         cursor:pointer
+     }
     .header .headerview .loginlogo {
         border-radius: 50%;
-        width: 50px;
-        height: 50px;
-        margin-right: 15px;
+        width: 40px;
+        height: 40px;
+        margin-right: -10px;
     }
-
-    .footer {
-        height: 30px;
-        width: 100%;
-        background: blue;
+    .drawerContent {
+        padding-top: 30px;
+        padding-left:30px;
+        margin-right: 30px;
+    }
+   .copyright {
+       position: absolute;
+       bottom: 0;
+       left: 0;
+       right: 0;
+       color: #fff;
+       width: 310px;
+       background: #324157;
+       padding-left: 12px;
+       padding-top: 10px;
+   }
+   .setPicker, .setfull {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       margin-top: 20px;
+       font-size: 16px;
+   }
+    .copyright .text {
+        color: #409EFF;
+    }
+    /deep/.el-drawer {
+        z-index: 300000;
     }
 </style>

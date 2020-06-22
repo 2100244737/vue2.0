@@ -3,7 +3,7 @@
     <div class="formBox-top">
       <el-form :model="formItem" label-width="70px" inline>
         <el-form-item class="marBottom7">
-          <el-button type="primary"  icon="el-icon-plus" @click="setAddHandle">添加</el-button>
+          <el-button type="primary"  icon="el-icon-plus" @click="setAddHandle">新增</el-button>
           <el-button type="primary"  icon="el-icon-refresh-left" @click="refreshHandle">刷新</el-button>
         </el-form-item>
       </el-form>
@@ -15,9 +15,9 @@
         <el-table-column prop="" label="角色名称" header-align="center" align="center"/>
         <el-table-column label="操作" header-align="center" align="center">
           <template slot-scope="scope">
-            <el-button  type="primary" @click="changeRoleBtn(scope.row)">修改</el-button>
-            <el-button  type="danger"  @click="deleteRole(scope.row)">删除</el-button>
-            <el-button  type="primary"  @click="changeLimit(scope.row)">配置</el-button>
+<!--            <el-button  type="primary" @click="changeRoleBtn(scope.row)">修改</el-button>-->
+<!--            <el-button  type="danger"  @click="deleteRole(scope.row)">删除</el-button>-->
+            <el-button  type="primary"  @click="changeLimit(scope.row)">配置角色</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -33,8 +33,8 @@
         <span class="title">{{dialogTitle}}</span>
       </div>
       <el-form :model="addEdit" ref="addEdit"  label-width="150px">
-        <el-row :gutter="20">
-          <el-col :span="12">
+          <el-row :gutter="20">
+              <el-col :span="12">
             <el-form-item label="类型：" >
               <el-select
                   clearable
@@ -90,7 +90,7 @@
       :before-close="resetCode"
       :visible.sync="configurationVisible">
       <div slot="title" class="dialogTitle clearFix">
-        <span class="title">角色管理-配置</span>
+        <span class="title">配置角色</span>
       </div>
       <div class="tree">
         <el-tree
@@ -221,7 +221,7 @@ export default {
       this.configurationVisible = true;
     },
     confirm() {
-      // 配置确定
+      // 配置角色保存
     },
     changeRoleBtn(row) {
       // 修改
@@ -238,7 +238,18 @@ export default {
        return false
       });
     },
-
+      handleCurrentChange(val) {
+          // 改变当前页码
+          var _t = this;
+          _t.options.currentPage = val;
+          _t.refreshHandle()
+      },
+      handleSizeChangeSub(val) {
+          // 改变每页显示条数
+          var _t = this;
+          _t.options.pageSize = val;
+          _t.refreshHandle()
+      },
   }
 
 }
